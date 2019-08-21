@@ -16,9 +16,8 @@
     <script defer src="/__/firebase/init.js"></script>
 
     <style media="screen">
-      body { background: linear-gradient(180deg, #662424, #5f6624, #665024, #2d6624, #244066, #572466, #662424); background-size: 1400% 1400%; color: rgba(0,0,0,0.87); font-family: Helvetica; margin: 0; padding: 0; animation: AnimationName 120s ease infinite;}
       
-
+      body { background: linear-gradient(180deg, #662424, #5f6624, #665024, #2d6624, #244066, #572466, #662424); background-size: 1400% 1400%; color: rgba(0,0,0,0.87); font-family: Helvetica; margin: 0; padding: 0; animation: AnimationName 120s ease infinite;}
       @keyframes AnimationName { 
         0%{background-position:50% 0%}
         50%{background-position:50% 100%}
@@ -33,9 +32,8 @@
       #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
       
       #splash { background: white; margin: 24px auto 24px; padding: 32px 24px;}
-      #splash h1 { color: black; font-weight: bold; font-size: 200px; margin: 0 0 0;}
+      #splash h1 { color: black; font-weight: bold; font-size: 160px; margin: 0 0 0;}
       #splash p { line-height: 140%; margin: 0 0 0; font-size: 20px; }
-      #splash iframe { allow:"fullscreen"; }
       #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
       @media (max-width: 600px) {
         body, #message { margin-top: 0; background: white; box-shadow: none; }
@@ -46,42 +44,47 @@
   <body>
     <div id="splash">
       <h1>Auxxie</h1>
-      <p>Don't freak out, the player is supposed to stop after 30 seconds.</p>
+      <p>This page is under construction.</p>
     </div>
-    <center><div id="player"></div></center>
+    <center><div id="ytplayer"></div></center>
     <p id="load">Firebase SDK Loading&hellip;</p>
 
     <script>
+      // Load the IFrame Player API code asynchronously.
       var tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
       var player;
       function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player', {
-          height: '390',
+        player = new YT.Player('ytplayer', {
+          height: '360',
           width: '640',
-          videoId: 'chd31lOa6xg',
+          videoId: 'tDQENR9ZeIE',
           events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
           }
         });
+        player.addEventListener('')
       }
       function onPlayerReady(event) {
         event.target.playVideo();
       }
-      // this code block here sets the player to stop after 6 seconds.
-      // it is part of the youtube API example, and only left in to help test.
-      var done = false;
+      var playing = true;
       function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING && !done) {
-          setTimeout(stopVideo, 30000);
-          done = true;
+        if (event.data == YT.PlayerState.ENDED && playing) {
+          playing = false;
+          nextVideo();
+        }
+        if (event.data == YT.PlayerState.CUED && !playing) {
+          playing = true;
+          console.log('player has been cued.');
+          event.target.playVideo();
         }
       }
-      function stopVideo() {
-        player.stopVideo();
+      function nextVideo() {
+        player.cueVideoById('chd31lOa6xg');
       }
     </script>
 
