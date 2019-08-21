@@ -52,10 +52,20 @@
     <center><div id="ytplayer"></div></center>
     <p id="load">Firebase SDK Loading&hellip;</p>
 
-	
+	<!-- Some code for adding to an array of youtube videos -->
+	<center>
+		<input type="text" name="Song Input"; id="linkInput"/>
+		<button onclick="pushValue();">Append Link</button>
+		<p id="pText"></p>
+		<br>
+		<button onclick="startPlaylist();">Start Playlist</button>
+	</center>	
 
 	<!--Script example of embded video being played-->
     <script>
+
+
+
       // Load the IFrame Player API code asynchronously.
       var tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";
@@ -90,8 +100,49 @@
         }
       }
       function nextVideo() {
-        player.cueVideoById('chd31lOa6xg');
+        //player.cueVideoById('chd31lOa6xg');
+		index++;
+		if(index > linkArray.length - 1){
+			index = 0;
+		}
+		player.cueVideoByUrl(linkArray[index]);
       }
+
+	  function startPlaylist(){
+	      //if(linkArray.length > 0){
+		  index = 0;
+	  	  player.cueVideoByUrl('https://www.youtube.com/watch?v=9wMXX-4ebTA');
+		  //player.cueVideoById('chd31lOa6xg');
+		 // }
+	  }
+
+	//Create an array to hold the links
+	var linkArray = [];
+	var index = 0;
+
+	function pushValue(){
+		//Get value from the input box
+		var inputText = document.getElementById('linkInput').value;
+
+		if(inputText != ""){
+			//append data to the array
+			linkArray.push(inputText);
+			document.getElementById('linkInput').value = '';
+		}
+		
+
+		//Simple code so I can see the array list
+		var pval = "";
+		for(i = 0; i < linkArray.length; i++)
+        {
+			pval = pval + linkArray[i] + "<br/>";
+        }
+		
+		// display array data
+        document.getElementById('pText').innerHTML = pval;
+
+	}
+
     </script>
 
 	<!--Script example of embded soundcloud track this API appears to no longer be functional-->
