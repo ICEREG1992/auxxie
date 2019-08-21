@@ -16,17 +16,26 @@
     <script defer src="/__/firebase/init.js"></script>
 
     <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Helvetica; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      body { background: linear-gradient(180deg, #662424, #5f6624, #665024, #2d6624, #244066, #572466, #662424); background-size: 1400% 1400%; color: rgba(0,0,0,0.87); font-family: Helvetica; margin: 0; padding: 0; animation: AnimationName 120s ease infinite;}
+      
+
+      @keyframes AnimationName { 
+        0%{background-position:50% 0%}
+        50%{background-position:50% 100%}
+        100%{background-position:50% 0%}
+      }
+
+      #message { background: white; max-width: 360px; margin: 100px auto 24px; padding: 32px 24px; border-radius: 3px; }
       #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
       #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
       #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
       #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
       #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
       
-      #splash { background: white; margin: 100px auto 16px; padding: 32px 24px;}
-      #splash h1 { color: black; font-weight: bold; font-size: 200px; margin: 0 0 16px;}
-      #splash p { line-height: 140%; margin: 0 0 24px; font-size: 20px; }
+      #splash { background: white; margin: 24px auto 24px; padding: 32px 24px;}
+      #splash h1 { color: black; font-weight: bold; font-size: 200px; margin: 0 0 0;}
+      #splash p { line-height: 140%; margin: 0 0 0; font-size: 20px; }
+      #splash iframe { allow:"fullscreen"; }
       #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
       @media (max-width: 600px) {
         body, #message { margin-top: 0; background: white; box-shadow: none; }
@@ -37,9 +46,44 @@
   <body>
     <div id="splash">
       <h1>Auxxie</h1>
-      <p>This page is under construction. Hahahahahahahaha! HA! hahaha! haha hehe hee hoo lordy that is FUNNY.</p>
+      <p>Don't freak out, the player is supposed to stop after 30 seconds.</p>
     </div>
+    <center><div id="player"></div></center>
     <p id="load">Firebase SDK Loading&hellip;</p>
+
+    <script>
+      var tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: 'chd31lOa6xg',
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
+      function onPlayerReady(event) {
+        event.target.playVideo();
+      }
+      // this code block here sets the player to stop after 6 seconds.
+      // it is part of the youtube API example, and only left in to help test.
+      var done = false;
+      function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING && !done) {
+          setTimeout(stopVideo, 30000);
+          done = true;
+        }
+      }
+      function stopVideo() {
+        player.stopVideo();
+      }
+    </script>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
