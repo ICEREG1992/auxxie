@@ -15,6 +15,9 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
+	<!--Load the Soundcloud SDK-->
+	<script src="https://connect.soundcloud.com/sdk/sdk-3.3.2.js"></script>
+
     <style media="screen">
       body { background: linear-gradient(180deg, #662424, #5f6624, #665024, #2d6624, #244066, #572466, #662424); background-size: 1400% 1400%; color: rgba(0,0,0,0.87); font-family: Helvetica; margin: 0; padding: 0; animation: AnimationName 120s ease infinite;}
       
@@ -51,6 +54,9 @@
     <center><div id="player"></div></center>
     <p id="load">Firebase SDK Loading&hellip;</p>
 
+	
+
+	<!--Script example of embded video being played-->
     <script>
       var tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";
@@ -84,6 +90,18 @@
         player.stopVideo();
       }
     </script>
+
+	<!--Script example of embded soundcloud track this API appears to no longer be functional-->
+	<script>
+		SC.initialize({
+		  client_id: 'YOUR_CLIENT_ID'
+		});
+
+		var track_url = 'https://soundcloud.com/william_william_s/april';
+		SC.oEmbed(track_url, { auto_play: true }).then(function(oEmbed) {
+		  console.log('oEmbed response: ', oEmbed);
+		});
+	</script>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
