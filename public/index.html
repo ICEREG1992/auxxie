@@ -51,20 +51,23 @@
     </div>
     <center><div id="ytplayer"></div></center>
     <p id="load">Firebase SDK Loading&hellip;</p>
+    <div id="scplayer">
+      <center>
+        <!--<iframe width="60%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/239931590&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>-->
+      </center>
+    </div>
 
-	<!-- Some code for adding to an array of youtube videos -->
-	<center>
-		<input type="text" name="Song Input"; id="linkInput"/>
-		<button onclick="pushValue();">Append Link</button>
-		<p id="pText"></p>
-		<br>
-		<button onclick="startPlaylist();">Start Playlist</button>
-	</center>	
+    <!-- Some code for adding to an array of youtube videos -->
+    <center>
+      <input type="text" name="Song Input"; id="linkInput"/>
+      <button onclick="pushValue();">Append Link</button>
+      <p id="pText"></p>
+      <br>
+      <button id="start" onclick="startPlaylist();" disabled>Start Playlist</button>
+    </center>	
 
-	<!--Script example of embded video being played-->
+    <!--Script example of embded video being played-->
     <script>
-
-
 
       // Load the IFrame Player API code asynchronously.
       var tag = document.createElement('script');
@@ -72,90 +75,88 @@
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
       var player;
+
+      var linkArray = [];
+      var index = 0;
+      
       function onYouTubeIframeAPIReady() {
-        player = new YT.Player('ytplayer', {
-          height: '360',
-          width: '640',
-          videoId: 'tDQENR9ZeIE',
-          events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-          }
-        });
-        player.addEventListener('')
+        //if (linkArray.length != 0) {
+          document.getElementById("start").removeAttribute("disabled");
+        //}
       }
+      
       function onPlayerReady(event) {
         event.target.playVideo();
       }
+      
       var playing = true;
       function onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.ENDED && playing) {
           playing = false;
           nextVideo();
         }
-        if (event.data == YT.PlayerState.CUED && !playing) {
-          playing = true;
-          console.log('player has been cued.');
-          event.target.playVideo();
-        }
       }
+
       function nextVideo() {
         //player.cueVideoById('chd31lOa6xg');
-		index++;
-		if(index > linkArray.length - 1){
-			index = 0;
-		}
-		player.cueVideoByUrl(linkArray[index]);
+        index++;
+        if(index > linkArray.length - 1){
+          index = 0;
+        }
+        player.loadVideoById(linkArray[index]);
       }
 
-	  function startPlaylist(){
-	      //if(linkArray.length > 0){
-		  index = 0;
-	  	  player.cueVideoByUrl('https://www.youtube.com/watch?v=9wMXX-4ebTA');
-		  //player.cueVideoById('chd31lOa6xg');
-		 // }
-	  }
+      function startPlaylist() {
+        player = null;
+        index = 0;
+        player = new YT.Player('ytplayer', {
+          height: '360',
+          width: '640',
+          videoId: linkArray[index],
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
 
-	//Create an array to hold the links
-	var linkArray = [];
-	var index = 0;
-
-	function pushValue(){
-		//Get value from the input box
-		var inputText = document.getElementById('linkInput').value;
-
-		if(inputText != ""){
-			//append data to the array
-			linkArray.push(inputText);
-			document.getElementById('linkInput').value = '';
-		}
-		
-
-		//Simple code so I can see the array list
-		var pval = "";
-		for(i = 0; i < linkArray.length; i++)
-        {
-			pval = pval + linkArray[i] + "<br/>";
+      // Create an array to hold the links
+      
+      function pushValue() {
+        // Get value from the input box
+        var inputText = document.getElementById('linkInput').value;
+        
+        if (inputText != ""){
+          // Simple parsing on input link
+          if (inputText.includes("watch?v=")) {
+            var inputTextParsed = inputText.substr(inputText.indexOf("v=") + 2, 11);
+          }
+          // append data to the array
+          linkArray.push(inputTextParsed);
+          document.getElementById('linkInput').value = '';
         }
-		
-		// display array data
+    
+        // Simple code so I can see the array list
+        var pval = "";
+        for(i = 0; i < linkArray.length; i++) {
+          pval = pval + linkArray[i] + "<br/>";
+        }
+    
+        // display array data
         document.getElementById('pText').innerHTML = pval;
-
-	}
-
+      }
     </script>
 
-	<!--Script example of embded soundcloud track this API appears to no longer be functional-->
-	<script>
-		SC.initialize({
-		  client_id: 'YOUR_CLIENT_ID'
-		});
-
-		var track_url = 'https://soundcloud.com/william_william_s/april';
-		SC.oEmbed(track_url, { auto_play: true }).then(function(oEmbed) {
-		  console.log('oEmbed response: ', oEmbed);
-		});
-	</script>
+    <!--Script example of embded soundcloud track this API appears to no longer be functional-->
+    <script>
+      SC.initialize({
+        client_id: 'YOUR_CLIENT_ID'
+      });
+      var track_url = 'https://soundcloud.com/william_william_s/april';
+      SC.oEmbed(track_url, { auto_play: true }).then(function(oEmbed) {
+        console.log('oEmbed response: ', oEmbed);
+      });
+    </script>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
