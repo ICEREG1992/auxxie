@@ -64,6 +64,7 @@
       <p id="pText"></p>
       <br>
       <button id="start" onclick="startPlaylist();" disabled>Start Playlist</button>
+	  <button id="shuffle" onclick="randomize_videos();">Shuffle the Array</button>
     </center>	
 
     <!--Script example of embded video being played-->
@@ -136,7 +137,12 @@
           document.getElementById('linkInput').value = '';
         }
     
-        // Simple code so I can see the array list
+		DisplayLinkList();
+      }
+
+
+	  function DisplayLinkList(){
+	  	 // Simple code so I can see the array list
         var pval = "";
         for(i = 0; i < linkArray.length; i++) {
           pval = pval + linkArray[i] + "<br/>";
@@ -144,7 +150,29 @@
     
         // display array data
         document.getElementById('pText').innerHTML = pval;
-      }
+	  }
+
+
+	  //Function stolen from the randomizer that im gonna use to shuffle the array
+	  function shuffle(d) {
+			var a, c, b = d.length;
+			if (b) {
+				while (--b) {
+					c = Math.floor(Math.random() * (b + 1));
+					a = d[c];
+					d[c] = d[b];
+					d[b] = a
+				}
+			}
+			return d;
+			
+		}
+
+		function randomize_videos() {
+			linkArray = shuffle(linkArray);
+			index = 0;
+			DisplayLinkList();
+		}
     </script>
 
     <!--Script example of embded soundcloud track this API appears to no longer be functional-->
