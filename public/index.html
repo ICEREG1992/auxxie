@@ -17,7 +17,7 @@
 
 	<!--Load the Soundcloud SDK-->
 	<script src="https://connect.soundcloud.com/sdk/sdk-3.3.2.js"></script>
-
+<!--
     <style media="screen">
       
       body { background: linear-gradient(180deg, #662424, #5f6624, #665024, #2d6624, #244066, #572466, #662424); background-size: 1400% 1400%; color: rgba(0,0,0,0.87); font-family: Helvetica; margin: 0; padding: 0; animation: AnimationName 120s ease infinite;}
@@ -42,8 +42,22 @@
         body, #message { margin-top: 0; background: white; box-shadow: none; }
         body { border-top: 16px solid #ffa100; }
       }
+	#name{
+		width: 50%;
+		padding: 12px 0px;
+		margin: 8px 0;
+		display: block;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		box-sizing: border-box;
+		margin-right: auto;
+		margin-left: auto;
+		font-size: 20px;
+		text-align: center;
+	}
     </style>
-  <link rel="stylesheet" href="styles.css">
+	-->
+	<link rel="stylesheet" type="text/css" href="styles.css" media="screen"/>
   </head>
   <body>
     <div id="splash">
@@ -66,6 +80,22 @@
       <br>
       <button id="start" onclick="startPlaylist();" disabled>Start Playlist</button>
 	  <button id="shuffle" onclick="randomize_videos();">Shuffle the Array</button>
+	  <h1 id = "title">Join a Party</h1>
+		<form action="/player/">
+                <div class="form-field">
+                    <label id = "label">Display Name</label>
+                    <input id = "name" type = "text" name="name" autofocus/>
+                </div>
+                <br>
+                <div class="form-field">
+                    <label id = "label">Party Pin</label>
+                    <input id = "pin" type="number" name="pin"/>
+                </div>
+                <br>
+                <div class="form-field">
+                    <button id = "joinButton">Join</button>
+                </div>
+        </form>
     </center>	
 
     <!--Script example of embded video being played-->
