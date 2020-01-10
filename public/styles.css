@@ -3,38 +3,38 @@ h1 {
 }
 
       
-      body { background: linear-gradient(180deg, #662424, #5f6624, #665024, #2d6624, #244066, #572466, #662424); background-size: 1400% 1400%; color: rgba(0,0,0,0.87); font-family: Helvetica; margin: 0; padding: 0; animation: AnimationName 120s ease infinite;}
-      @keyframes AnimationName { 
-        0%{background-position:50% 0%}
-        50%{background-position:50% 100%}
-        100%{background-position:50% 0%}
-      }
+body { background: linear-gradient(180deg, #662424, #5f6624, #665024, #2d6624, #244066, #572466, #662424); background-size: 1400% 1400%; color: rgba(0,0,0,0.87); font-family: Helvetica; margin: 0; padding: 0; animation: AnimationName 120s ease infinite;}
+@keyframes AnimationName { 
+  0%{background-position:50% 0%}
+  50%{background-position:50% 100%}
+  100%{background-position:50% 0%}
+}
 
-      #message { background: white; max-width: 360px; margin: 100px auto 24px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      
-      #splash { background: white; margin: 24px auto 24px; padding: 32px 24px;}
-      #splash h1 { color: black; font-weight: bold; font-size: 160px; margin: 0 0 0;}
-      #splash p { line-height: 140%; margin: 0 0 0; font-size: 20px; }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-	#name{
-		width: 50%;
-		padding: 12px 0px;
-		margin: 8px 0;
-		display: block;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-		box-sizing: border-box;
-		margin-right: auto;
-		margin-left: auto;
-		font-size: 20px;
-		text-align: center;
-	}
+#message { background: white; max-width: 360px; margin: 100px auto 24px; padding: 32px 24px; border-radius: 3px; }
+#message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+#message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+#message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+#message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+#message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+
+#splash { background: white; margin: 24px auto 24px; padding: 32px 24px;}
+#splash h1 { color: black; font-weight: bold; font-size: 160px; margin: 0 0 0;}
+#splash p { line-height: 140%; margin: 0 0 0; font-size: 20px; }
+#load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+@media (max-width: 600px) {
+  body, #message { margin-top: 0; background: white; box-shadow: none; }
+  body { border-top: 16px solid #ffa100; }
+}
+#name{
+	width: 50%;
+	padding: 12px 0px;
+	margin: 8px 0;
+	display: block;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+	margin-right: auto;
+	margin-left: auto;
+	font-size: 20px;
+	text-align: center;
+}
