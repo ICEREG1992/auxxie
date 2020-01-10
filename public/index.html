@@ -57,13 +57,30 @@
 	}
     </style>
 	-->
-	<link rel="stylesheet" type="text/css" href="/styles.css" media="screen"/>
+	<link rel="stylesheet" type="text/css" href="styles.css" media="screen"/>
   </head>
   <body>
     <div id="splash">
       <h1>Auxxie</h1>
       <p>This page is under construction.</p>
+
     </div>
+		<h1 id = "title">Join a Party</h1>
+		<form>
+                <div class="form-field">
+                    <label id = "label">Display Name</label>
+                    <input id = "name" type = "text" name="name" autofocus/>
+                </div>
+                <br>
+                <div class="form-field">
+                    <label id = "label">Party Pin</label>
+                    <input id = "pin" type="number" name="pin"/>
+                </div>
+                <br>
+                <div class="form-field">
+                    <button id = "joinButton">Join</button>
+                </div>
+        </form>
     <center><div id="ytplayer"></div></center>
     <p id="load">Firebase SDK Loading&hellip;</p>
     <div id="scplayer">
@@ -80,22 +97,7 @@
       <br>
       <button id="start" onclick="startPlaylist();" disabled>Start Playlist</button>
 	  <button id="shuffle" onclick="randomize_videos();">Shuffle the Array</button>
-	  <h1 id = "title">Join a Party</h1>
-		<form action="/player/">
-                <div class="form-field">
-                    <label id = "label">Display Name</label>
-                    <input id = "name" type = "text" name="name" autofocus/>
-                </div>
-                <br>
-                <div class="form-field">
-                    <label id = "label">Party Pin</label>
-                    <input id = "pin" type="number" name="pin"/>
-                </div>
-                <br>
-                <div class="form-field">
-                    <button id = "joinButton">Join</button>
-                </div>
-        </form>
+	  
     </center>	
 
     <!--Script example of embded video being played-->

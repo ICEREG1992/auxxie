@@ -18,7 +18,7 @@ p#message { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
 a#message{ display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
 #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
 
-#splash { background: blue; margin: 24px auto 24px; padding: 32px 24px;}
+#splash { background: white; margin: 24px auto 24px; padding: 32px 24px;}
 #splash h1 { color: black; font-weight: bold; font-size: 160px; margin: 0 0 0;}
 #splash p { line-height: 140%; margin: 0 0 0; font-size: 20px; }
 #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
@@ -26,16 +26,65 @@ a#message{ display: block; text-align: center; background: #039be5; text-transfo
   body, #message { margin-top: 0; background: white; box-shadow: none; }
   body { border-top: 16px solid #ffa100; }
 }
+#title{
+    font-family: 'Raleway', sans-serif;
+    text-align: center;
+    font-size: 50px;
+    color: white;
+}
 #name{
-	width: 50%;
-	padding: 12px 0px;
-	margin: 8px 0;
-	display: block;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	box-sizing: border-box;
-	margin-right: auto;
-	margin-left: auto;
-	font-size: 20px;
-	text-align: center;
+    width: 25%;
+    padding: 12px 0px;
+    margin: 8px 0;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 20px;
+    text-align: center;
+}
+#pin{
+    width: 25%;
+    padding: 12px 0px;
+    margin: 8px 0;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 20px;
+    text-align: center;
+}
+#label{
+    display: block;
+    text-align: center;
+    font-size: 25px;
+    font-family: 'Raleway', sans-serif;
+    color: white;
+}
+#host{
+    color: white;
+    text-decoration: none;
+}
+#host:hover{
+    text-decoration:underline;
+}
+#joinButton{
+    width: 25%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 20px;
+    background-color: #3A3B3A;
+    font-family: 'Raleway', sans-serif;
 }
