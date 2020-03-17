@@ -9,11 +9,17 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
+    "rewrites": [ {
+      "source": "./",
+      "destination": "/index.html"
+    }, {
+      "source": "/room{,/**}",
+      "destination": "/room.html"
+    } ],
+    "redirects": [ {
+      "source": "/r/:num",
+      "destination": "/room?n=:num",
+      "type": 301
+    } ]
   }
 }

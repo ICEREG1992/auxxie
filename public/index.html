@@ -1,245 +1,29 @@
 <!DOCTYPE html>
+
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Auxxie</title>
-    <link rel="icon" href="favicon.png">
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/6.4.0/firebase-app.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/6.4.0/firebase-auth.js"></script>
-    <script defer src="/__/firebase/6.4.0/firebase-database.js"></script>
-    <script defer src="/__/firebase/6.4.0/firebase-messaging.js"></script>
-    <script defer src="/__/firebase/6.4.0/firebase-storage.js"></script>
-    <!-- initialize the SDK after all desired features are loaded -->
-    <script defer src="/__/firebase/init.js"></script>
-
-	<!--Load the Soundcloud SDK-->
-	<script src="https://connect.soundcloud.com/sdk/sdk-3.3.2.js"></script>
-<!--
-    <style media="screen">
-      
-      body { background: linear-gradient(180deg, #662424, #5f6624, #665024, #2d6624, #244066, #572466, #662424); background-size: 1400% 1400%; color: rgba(0,0,0,0.87); font-family: Helvetica; margin: 0; padding: 0; animation: AnimationName 120s ease infinite;}
-      @keyframes AnimationName { 
-        0%{background-position:50% 0%}
-        50%{background-position:50% 100%}
-        100%{background-position:50% 0%}
-      }
-
-      #message { background: white; max-width: 360px; margin: 100px auto 24px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      
-      #splash { background: white; margin: 24px auto 24px; padding: 32px 24px;}
-      #splash h1 { color: black; font-weight: bold; font-size: 160px; margin: 0 0 0;}
-      #splash p { line-height: 140%; margin: 0 0 0; font-size: 20px; }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-	#name{
-		width: 50%;
-		padding: 12px 0px;
-		margin: 8px 0;
-		display: block;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-		box-sizing: border-box;
-		margin-right: auto;
-		margin-left: auto;
-		font-size: 20px;
-		text-align: center;
-	}
-    </style>
-	-->
-	<link rel="stylesheet" type="text/css" href="styles.css" media="screen"/>
+    <link rel="stylesheet" type = "text/css" href = "site.css">
+    <title>
+      auxxie test site website
+    </title>
+    <meta charset="utf-8" /> 
   </head>
   <body>
-    <div id="splash">
-      <h1>Auxxie</h1>
-      <p>This page is under construction.</p>
-
-    </div>
-		<h1 id = "title">Join a Party</h1>
-		<form>
-                <div class="form-field">
-                    <label id = "label">Display Name</label>
-                    <input id = "name" type = "text" name="name" autofocus/>
-                </div>
-                <br>
-                <div class="form-field">
-                    <label id = "label">Party Pin</label>
-                    <input id = "pin" type="number" name="pin"/>
-                </div>
-                <br>
-                <div class="form-field">
-                    <button id = "joinButton">Join</button>
-                </div>
-        </form>
-    <center><div id="ytplayer"></div></center>
-    <p id="load">Firebase SDK Loading&hellip;</p>
-    <div id="scplayer">
-      <center>
-        <!--<iframe width="60%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/239931590&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>-->
-      </center>
+    <a href='./'>auxxie-test</a>
+    <p id='info'>test site website test site website test site website</p>
+    <hr>
+    <div id='buttons'>
+      <button id='buttonOne' onclick="window.location.href = '/room';">hey click me</button> <br>
+      <button id='buttonTwo'>ooh ooh me too</button> <br>
     </div>
 
-    <!-- Some code for adding to an array of youtube videos -->
-    <center>
-      <input type="text" name="Song Input"; id="linkInput"/>
-      <button onclick="pushValue();">Append Link</button>
-      <p id="pText"></p>
-      <br>
-      <button id="start" onclick="startPlaylist();" disabled>Start Playlist</button>
-	  <button id="shuffle" onclick="randomize_videos();">Shuffle the Array</button>
-	  
-    </center>	
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+	<script src="/__/firebase/7.11.0/firebase-app.js"></script>
+	<!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+	<script src="/__/firebase/7.11.0/firebase-analytics.js"></script>
+	<!-- Add Firebase products that you want to use -->
+	<script src="/__/firebase/7.11.0/firebase-auth.js"></script>
+	<script src="/__/firebase/7.11.0/firebase-database.js"></script>
 
-    <!--Script example of embded video being played-->
-    <script>
-
-      // Load the IFrame Player API code asynchronously.
-      var tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      var player;
-
-      var linkArray = [];
-      var index = 0;
-      
-      function onYouTubeIframeAPIReady() {
-        //if (linkArray.length != 0) {
-          document.getElementById("start").removeAttribute("disabled");
-        //}
-      }
-      
-      function onPlayerReady(event) {
-        event.target.playVideo();
-      }
-      
-      var playing = true;
-      function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.ENDED && playing) {
-          playing = false;
-          nextVideo();
-        }
-      }
-
-      function nextVideo() {
-        //player.cueVideoById('chd31lOa6xg');
-        index++;
-        if(index > linkArray.length - 1){
-          index = 0;
-        }
-        player.loadVideoById(linkArray[index]);
-      }
-
-      function startPlaylist() {
-        player = null;
-        index = 0;
-        player = new YT.Player('ytplayer', {
-          height: '360',
-          width: '640',
-          videoId: linkArray[index],
-          events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-          }
-        });
-      }
-
-      // Create an array to hold the links
-      
-      function pushValue() {
-        // Get value from the input box
-        var inputText = document.getElementById('linkInput').value;
-        
-        if (inputText != ""){
-          // Simple parsing on input link
-          if (inputText.includes("watch?v=")) {
-            var inputTextParsed = inputText.substr(inputText.indexOf("v=") + 2, 11);
-          }
-          // append data to the array
-          linkArray.push(inputTextParsed);
-          document.getElementById('linkInput').value = '';
-        }
-    
-		DisplayLinkList();
-      }
-
-
-	  function DisplayLinkList(){
-	  	 // Simple code so I can see the array list
-        var pval = "";
-        for(i = 0; i < linkArray.length; i++) {
-          pval = pval + linkArray[i] + "<br/>";
-        }
-    
-        // display array data
-        document.getElementById('pText').innerHTML = pval;
-	  }
-
-
-	  //Function stolen from the randomizer that im gonna use to shuffle the array
-	  function shuffle(d) {
-			var a, c, b = d.length;
-			if (b) {
-				while (--b) {
-					c = Math.floor(Math.random() * (b + 1));
-					a = d[c];
-					d[c] = d[b];
-					d[b] = a
-				}
-			}
-			return d;
-			
-		}
-
-		function randomize_videos() {
-			linkArray = shuffle(linkArray);
-			index = 0;
-			DisplayLinkList();
-		}
-    </script>
-
-    <!--Script example of embded soundcloud track this API appears to no longer be functional-->
-    <script>
-      SC.initialize({
-        client_id: 'YOUR_CLIENT_ID'
-      });
-      var track_url = 'https://soundcloud.com/william_william_s/april';
-      SC.oEmbed(track_url, { auto_play: true }).then(function(oEmbed) {
-        console.log('oEmbed response: ', oEmbed);
-      });
-    </script>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
-          document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
-    </script>
   </body>
 </html>

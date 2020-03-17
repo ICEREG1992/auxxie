@@ -1,0 +1,50 @@
+
+body, html {
+  height: 100%;
+  font-family: helvetica;
+}
+
+a {
+  font-size: 72px;
+  margin: 0px;
+  font-weight: bold;
+  color: black;
+  text-decoration: none;
+}
+
+p {
+  margin: 0px 0px 14px 0px;
+}
+
+button {
+  margin: 2px 0px;
+  background-color: white;
+  border: none;
+  padding: 5px 0px;
+  text-align: center;
+  font-size: 16px;
+  transition-duration: .1s;
+}
+
+button:hover {
+  background-color: #e7e7e7;
+}
+
+button:active {
+  color: white;
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+button:focus {
+  outline: 0;
+}
+
+#roomtitle {
+  text-align: center;
+  margin: 100px 0px;
+  font-size: 60px;
+  width: 100%;
+}
