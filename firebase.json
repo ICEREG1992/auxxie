@@ -15,6 +15,9 @@
     }, {
       "source": "/room{,/**}",
       "destination": "/room.html"
+    }, {
+      "source": "m.auxxie-temp.firebaseapp.com",
+      "destination": "/m/index.html"
     } ],
     "redirects": [ {
       "source": "/r/:num",
