@@ -1,4 +1,4 @@
-var roomnum;
+var roomNum;
 var roomref;
 
 var config = {
@@ -8,11 +8,21 @@ var config = {
 	storageBucket: "auxxie-temp.appspot.com"
 };
 firebase.initializeApp(config);
-
-// Get a reference to the database service
 var database = firebase.database();
 
-roomnum = claimRoom();
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+
+if (!urlParams.has('n')) {
+		claimRoom();
+}
+
+roomNum = urlParams.get('n');
+document.getElementById('roomtitle').innerHTML = 'welcome to room ' + roomNum;
+// TODO: load room
+
+
+// functions //
 
 function claimRoom() {
 	var ticket = database.ref('/openrooms').limitToFirst(1)
@@ -36,7 +46,8 @@ function claimRoom() {
 
 			// remove pair from openrooms
 			database.ref('/openrooms').child(key).remove();
-			return snapshot.val()[key];
+			window.location.replace("https://auxxie-temp.firebaseapp.com/room?n=" + paddy(key, 6));
+			// no return, the redirect nukes all js
 		}
 	});
 }
