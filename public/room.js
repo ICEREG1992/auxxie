@@ -1,4 +1,4 @@
-var roomnum;
+var roomNum;
 var roomref;
 
 var config = {
@@ -8,13 +8,21 @@ var config = {
 	storageBucket: "auxxie-temp.appspot.com"
 };
 firebase.initializeApp(config);
-
-// Get a reference to the database service
 var database = firebase.database();
-var functions = firebase.functions();
-var addMessage = firebase.functions().httpsCallable('startTimer');
 
-roomnum = claimRoom();
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+
+if (!urlParams.has('n')) {
+		claimRoom();
+}
+
+roomNum = urlParams.get('n');
+document.getElementById('roomtitle').innerHTML = 'welcome to room ' + roomNum;
+// TODO: load room
+
+
+// functions //
 
 function claimRoom() {
 	var ticket = database.ref('/openrooms').limitToFirst(1)
@@ -31,29 +39,28 @@ function claimRoom() {
 			update['/closedrooms/' + key + '/n'] = 0;
 			update['/closedrooms/' + key + '/videos/0/id'] = 'W9nZ6u15yis';
 			update['/closedrooms/' + key + '/videos/0/length'] = 10;
+			update['/closedrooms/' + key + '/timestamp'] = Date.now();
 			update['/closedrooms/' + key + '/key'] = snapshot.val()[key];
 			database.ref().update(update);
 			roomref = '/closedrooms/' + key;
 
 			// remove pair from openrooms
 			database.ref('/openrooms').child(key).remove();
-			var startTimer = functions.httpsCallable('startTimer');
-			startTimer(snapshot.val()[key]);
-			return snapshot.val()[key];
+			window.location.replace("https://auxxie-temp.firebaseapp.com/room?n=" + paddy(key, 6));
+			// no return, the redirect nukes all js
 		}
 	});
 }
 
 function writeOpenRooms(num) {
   database.ref('/openrooms').set({ 1: '000001'});
+  var update = {};
   for (var i = 2; i < num + 1; i++) {
   	var newRoomKey = database.ref('openrooms').push().key;    // { i: paddy(i, 6); }
   	newRoomKey = i;
-  	var update = {};
   	update['/openrooms/' + newRoomKey] = paddy(i, 6);
-  	database.ref().update(update); 
   }
-  database.ref('closedrooms').set({ 0: '000000' });	
+  database.ref().update(update);
 }
 
 function paddy(num, padlen, padchar) {
