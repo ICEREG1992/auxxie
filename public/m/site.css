@@ -2,6 +2,8 @@
 body, html {
   height: 100%;
   font-family: helvetica;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -88,13 +90,9 @@ input[type=number] {
 }
 
 #spacing {
-  height : 10%;
+  height: 10%;
 }
 
 label {
   font-size: 30px;
 }
-
-body {
-	margin: 0;
-	}

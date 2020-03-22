@@ -14,12 +14,11 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 
 if (!urlParams.has('n')) {
-		claimRoom();
+	claimRoom();
+} else {
+	roomNum = urlParams.get('n');
+	document.getElementById('roomtitle').innerHTML = 'welcome to room ' + roomNum;
 }
-
-roomNum = urlParams.get('n');
-document.getElementById('roomtitle').innerHTML = 'welcome to room ' + roomNum;
-// TODO: load room
 
 
 // functions //

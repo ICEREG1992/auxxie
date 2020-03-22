@@ -16,12 +16,12 @@
       "source": "/room{,/**}",
       "destination": "/room.html"
     }, {
-      "source": "m.auxxie-temp.firebaseapp.com",
+      "source": "auxxie-temp.firebaseapp.com/m",
       "destination": "/m/index.html"
     } ],
     "redirects": [ {
       "source": "/r/:num",
-      "destination": "/room?n=:num",
+      "destination": "/m/room?n=:num",
       "type": 301
     } ]
   }
