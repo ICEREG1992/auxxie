@@ -94,3 +94,7 @@ input[type=number] {
 label {
   font-size: 30px;
 }
+
+body {
+	margin: 0;
+	}
