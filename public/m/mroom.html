@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <link rel="stylesheet" type = "text/css" href = "/site.css">
+    <link rel="stylesheet" type = "text/css" href = "/m/site.css">
     <title>
       mobile test
     </title>
@@ -12,12 +12,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <div id="page-content">
       <div id="title-div">
-        <a id="roomtitle" href='./'>room</a>
+        <a id="roomtitle" href='./'>room 123456</a>
+        <input id="add-button" type="button" onclick="openAddForm()" value="＋">
         <hr>
       </div>
-      <div id='forms'>
-        <p> How may licks does it take to get to the center of a tootsie pop?</p>
+      <div id='queue'>
+        <div class='entry'>
+          <div class='thumbnail'>
+            <img src='blankthumb.png'>
+          </div>
+          <div class='vid-data'>
+            <div class='vid-title'>Test Video Title (must watch until end!)</div>
+            <div class='vid-author'>by <b>Test Author</b></div>
+            <div class='vid-length'>4:20</div>
+          </div>
+          <div class='votes'>
+            <div class='vote-up'>▲</div>
+            <div class='vote-count'>4</div>
+            <div class='vote-down'>▼</div>
+          </div>
+        </div>
       </div>
+      <div class='spacing'><hr></div>
     </div>
 
     <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
