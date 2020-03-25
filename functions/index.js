@@ -5,9 +5,9 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 var db = admin.database();
 
-exports.deleteOldItems = functions.database.ref('/openrooms').onWrite((change, context) => {
-  var ref = change.after.ref.parent.child('/closedrooms'); // reference to the items
-  var cutoff = Date.now() - (10 * 1000);
+exports.deleteOldItems = functions.database.ref('/closedrooms').onWrite((change, context) => {
+  var ref = change.after.ref; // reference to the items
+  var cutoff = Date.now() - (60 * 60 * 1000); // 60 minutes old
   var oldItemsQuery = ref.orderByChild('timestamp').endAt(cutoff);
   return oldItemsQuery.once('value', function(snapshot) {
     // create a map with all children that need to be removed
