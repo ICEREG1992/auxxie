@@ -27,8 +27,22 @@ firebase.initializeApp(config);
 var database = firebase.database();
 randomizeTagline();
 
+
+var database = firebase.database();
 function findRoom() {
-	document.getElementById("roomInput").submit();
+	//document.getElementById("roomInput").submit();
+	var x = document.getElementById("roomForm");
+	database.ref('closedrooms/' + x.elements[0].value).once("value",snapshot => {
+   if (snapshot.exists()){
+      console.log("exists!");
+	console.log(x.elements[0].value);
+	console.log("Hello GORDON!");
+	window.location = 'https://auxxie-temp.firebaseapp.com/r/' + x.elements[0].value;
+   }
+
+
+	});
+
 }
 
 function randomizeTagline() {

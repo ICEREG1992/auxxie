@@ -17,10 +17,11 @@
         <hr>
       </div>
       <div id='forms'>
-        <form id="roomForm">
+        <form id="roomForm" onsubmit="myFunction(); return false;">
           <label for="roomInput">enter a room number</label><br><br>
           <input type="number" id="roomInput" name="n">
           <input type="button" onclick="findRoom()" value="join room">
+		  
         </form>
       </div>
       <div id='spacing'></div>
