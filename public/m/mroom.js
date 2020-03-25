@@ -44,6 +44,9 @@ function incrementUsers() {
 function loadActiveQueue() {
 	var queueElem = document.getElementById('queue');
 	roomRef.child('videos').on('value', function(snapshot) {
+		while (queueElem.firstChild) {
+    		queueElem.removeChild(queueElem.lastChild);
+ 		}
 		var vidCount = snapshot.numChildren();
 		for (var i = 0; i < vidCount; i++) {
 			var vid = snapshot.child(i);
@@ -75,6 +78,7 @@ function loadActiveQueue() {
 
 			var upElem = document.createElement('div');
 			upElem.setAttribute('class', 'vote-up');
+			upElem.setAttribute('onclick', 'voteUp(this)');
 			upElem.innerHTML = '▲';
 
 			var countElem = document.createElement('div');
@@ -83,6 +87,7 @@ function loadActiveQueue() {
 
 			var downElem = document.createElement('div');
 			downElem.setAttribute('class', 'vote-down');
+			downElem.setAttribute('onclick', 'voteDown(this)');
 			downElem.innerHTML = '▼';
 
 			//assembly
@@ -112,6 +117,80 @@ function updateTimestamp() {
 
 function openAddForm() {
 	console.log('openAddForm() has yet to be implemented.');
+}
+
+function voteUp(elem) {
+	var val = 1;
+	var downButton = elem.parentElement.children[0];
+	if (downButton.getAttribute('class') == 'vote-down-clicked') {
+		downButton.setAttribute('class', 'vote-down');
+		val = 2;
+	}
+	var vid = elem.parentElement.parentElement;
+	var vidNumber;
+	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
+		var tempVotes = snapshot.val();
+		tempVotes++;
+		var update = {};
+		update['votes'] = tempVotes;
+		roomRef.child('videos').child(vidNumber).update(update);
+	});
+	elem.setAttribute('class', 'vote-up-clicked');
+	elem.setAttribute('onclick', 'unvoteUp(this)');
+}
+
+function voteDown(elem) {
+	var val = 1;
+	var upButton = elem.parentElement.children[0];
+	if (upButton.getAttribute('class') == 'vote-up-clicked') {
+		upButton.setAttribute('class', 'vote-up');
+		val = 2;
+	}
+	var vid = elem.parentElement.parentElement;
+	var vidNumber = 0;
+	while((vid = vid.previousSibling) != null) {
+  		i++;
+	}
+	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
+		var tempVotes = snapshot.val();
+		tempVotes -= val;
+		var update = {};
+		update['votes'] = tempVotes;
+		roomRef.child('videos').child(vidNumber).update(update);
+	});
+	elem.setAttribute('class', 'vote-down-clicked');
+	elem.setAttribute('onclick', 'unvoteDown(this)');
+}
+
+function unvoteUp(elem) {
+	var vid = elem.parentElement.parentElement;
+	var vidNumber;
+	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
+		var tempVotes = snapshot.val();
+		tempVotes--;
+		var update = {};
+		update['votes'] = tempVotes;
+		roomRef.child('videos').child(vidNumber).update(update);
+	});
+	elem.setAttribute('class', 'vote-up');
+	elem.setAttribute('onclick', 'voteUp(this)');
+}
+
+function unvoteDown(elem) {
+	var vid = elem.parentElement.parentElement;
+	var vidNumber;
+	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
+		var tempVotes = snapshot.val();
+		tempVotes++;
+		var update = {};
+		update['votes'] = tempVotes;
+		roomRef.child('videos').child(vidNumber).update(update);
+	});
+	elem.setAttribute('class', 'vote-down');
+	elem.setAttribute('onclick', 'voteDown(this)');
 }
 
 function timeFormat(time)

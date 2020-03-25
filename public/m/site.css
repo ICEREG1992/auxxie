@@ -117,7 +117,7 @@ input[type=number] {
 .spacing {
   height: 10%;
   width: 100%;
-  flex-basis: 10%;
+  flex-basis: 55px;
 }
 
 label {
@@ -189,7 +189,7 @@ label {
   min-height: 35px;
 }
 
-.vote-count, .vote-up, .vote-down {
+.vote-count, .vote-up, .vote-down, .vote-up-clicked, .vote-down-clicked {
   font-size: 20px;
   align-items: center;
   font-weight: bold;
@@ -199,4 +199,8 @@ label {
 
 .vote-count {
   max-height: 20px;
+}
+
+.vote-up-clicked, .vote-down-clicked {
+  color: orange;
 }
