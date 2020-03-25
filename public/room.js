@@ -52,9 +52,9 @@ function claimRoom() {
 }
 
 function writeOpenRooms(num) {
-  database.ref('/openrooms').set({ 1: '000001'});
+  database.ref('/openrooms').set({ 111111: '111111'});
   var update = {};
-  for (var i = 2; i < num + 1; i++) {
+  for (var i = 111112; i < num + 111110; i++) {
   	var newRoomKey = database.ref('openrooms').push().key;    // { i: paddy(i, 6); }
   	newRoomKey = i;
   	update['/openrooms/' + newRoomKey] = paddy(i, 6);

@@ -13,13 +13,13 @@
     <div id="page-content">
       <div id="title-div">
         <a href='./'>auxxie</a>
-        <p id='info'>coulda, shoulda, woulda</p>
+        <p id='tagline'>coulda, shoulda, woulda</p>
         <hr>
       </div>
       <div id='forms'>
         <form id="roomForm">
           <label for="roomInput">enter a room number</label><br><br>
-          <input type="number" id="roomInput" step="0">
+          <input type="number" id="roomInput" name="n">
           <input type="button" onclick="findRoom()" value="join room">
         </form>
       </div>
@@ -27,12 +27,13 @@
     </div>
 
     <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-	<script src="/__/firebase/7.11.0/firebase-app.js"></script>
-	<!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
-	<script src="/__/firebase/7.11.0/firebase-analytics.js"></script>
-	<!-- Add Firebase products that you want to use -->
-	<script src="/__/firebase/7.11.0/firebase-auth.js"></script>
-	<script src="/__/firebase/7.11.0/firebase-database.js"></script>
+  	<script src="/__/firebase/7.11.0/firebase-app.js"></script>
+  	<!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+  	<script src="/__/firebase/7.11.0/firebase-analytics.js"></script>
+  	<!-- Add Firebase products that you want to use -->
+  	<script src="/__/firebase/7.11.0/firebase-auth.js"></script>
+  	<script src="/__/firebase/7.11.0/firebase-database.js"></script>
+    <script src="/m/mindex.js"></script>
 
   </body>
 </html>

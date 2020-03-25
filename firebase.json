@@ -18,6 +18,9 @@
     }, {
       "source": "auxxie-temp.firebaseapp.com/m",
       "destination": "/m/index.html"
+    }, {
+      "source": "/m/room",
+      "destination": "/m/mroom.html"
     } ],
     "redirects": [ {
       "source": "/r/:num",
