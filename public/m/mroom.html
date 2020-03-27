@@ -17,6 +17,20 @@
         <hr>
       </div>
       <div id='queue'></div>
+      <div id='add-form'>
+      	<div id='add-form-content'>
+  		  <div id='add-form-symbols'>
+  		    <div id='add-form-instructions'>enter a youtube url to add it to the queue</div>
+  		    <button id='add-form-close' onclick="closeAddForm()">✕</button>
+  		  </div>
+  		  <div>
+  		    <form id='add-form-form' onsubmit="addToQueue(); return false;">
+  		  	  <input type='url' id='add-form-textbox'>
+  		  	  <input type='button' id='add-form-submit' onclick="addToQueue()" value="add video">
+  		    </form>
+  		  </div>
+      	</div>
+      </div>
       <div class='spacing'><hr></div>
     </div>
 

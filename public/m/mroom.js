@@ -11,6 +11,12 @@ var database = firebase.database();
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
+window.onclick = function(event) {
+  var formRef = document.getElementById('add-form');
+  if (event.target == formRef) {
+    formRef.style.display = "none";
+  }
+}
 
 if (!urlParams.has('n')) {
 	window.location.replace("https://auxxie-temp.firebaseapp.com/m/");
@@ -76,7 +82,7 @@ function loadActiveQueue() {
 			var votesElem = document.createElement('div');
 			votesElem.setAttribute('class', 'votes');
 
-			var upElem = document.createElement('div');
+			var upElem = document.createElement('button');
 			upElem.setAttribute('class', 'vote-up');
 			upElem.setAttribute('onclick', 'voteUp(this)');
 			upElem.innerHTML = '▲';
@@ -85,7 +91,7 @@ function loadActiveQueue() {
 			countElem.setAttribute('class', 'vote-count');
 			countElem.innerHTML = vid.child('votes').val();
 
-			var downElem = document.createElement('div');
+			var downElem = document.createElement('button');
 			downElem.setAttribute('class', 'vote-down');
 			downElem.setAttribute('onclick', 'voteDown(this)');
 			downElem.innerHTML = '▼';
@@ -116,10 +122,17 @@ function updateTimestamp() {
 }
 
 function openAddForm() {
-	console.log('openAddForm() has yet to be implemented.');
+	var formRef = document.getElementById('add-form');
+	formRef.style.display = "block";
+}
+
+function closeAddForm() {
+	var formRef = document.getElementById('add-form');
+	formRef.style.display = "none";
 }
 
 function voteUp(elem) {
+	updateTimestamp();
 	var val = 1;
 	var downButton = elem.parentElement.children[0];
 	if (downButton.getAttribute('class') == 'vote-down-clicked') {
@@ -141,6 +154,7 @@ function voteUp(elem) {
 }
 
 function voteDown(elem) {
+	updateTimestamp();
 	var val = 1;
 	var upButton = elem.parentElement.children[0];
 	if (upButton.getAttribute('class') == 'vote-up-clicked') {
@@ -164,6 +178,7 @@ function voteDown(elem) {
 }
 
 function unvoteUp(elem) {
+	updateTimestamp();
 	var vid = elem.parentElement.parentElement;
 	var vidNumber;
 	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
@@ -179,6 +194,7 @@ function unvoteUp(elem) {
 }
 
 function unvoteDown(elem) {
+	updateTimestamp();
 	var vid = elem.parentElement.parentElement;
 	var vidNumber;
 	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
