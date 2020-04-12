@@ -34,14 +34,13 @@ function claimRoom() {
 			var bgvideos = {};
 			var videos = {};
 			update['/closedrooms/' + key + '/bgvideos/0/id'] = 'W9nZ6u15yis';
-			update['/closedrooms/' + key + '/n'] = 0;
 			update['/closedrooms/' + key + '/videos/0/id'] = 'W9nZ6u15yis';
 			update['/closedrooms/' + key + '/videos/0/length'] = 10;
 			update['/closedrooms/' + key + '/videos/0/title'] = 'Black Screen 10 seconds HD';
 			update['/closedrooms/' + key + '/videos/0/author'] = 'Harrison Suderman';
-			update['/closedrooms/' + key + '/videos/0/votes'] = 1;
 			update['/closedrooms/' + key + '/timestamp'] = Date.now();
 			update['/closedrooms/' + key + '/key'] = snapshot.val()[key];
+			update['/closedrooms/' + key + '/users/host'] = 0;
 			database.ref().update(update);
 			roomref = '/closedrooms/' + key;
 

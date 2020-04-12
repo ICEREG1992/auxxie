@@ -24,6 +24,12 @@ hr {
   width: 100%;
 }
 
+input, textarea {
+  -webkit-appearance: none;
+  -webkit-border-radius: 0px;
+  border-radius: 0;
+}
+
 input[type=button], button {
   background-color: white;
   border: none;
@@ -34,11 +40,11 @@ input[type=button], button {
   cursor: pointer;
 }
 
-input[type=button]:hover, button:hover {
+input[type=button]:hover {
   background-color: #e7e7e7;
 }
 
-input[type=button]:active, button:active {
+input[type=button]:active {
   color: white;
 }
 
@@ -195,6 +201,11 @@ label {
   cursor: pointer;
 }
 
+.vote-up:hover, .vote-down:hover, .vote-up-clicked:hover, .vote-down-clicked:hover {
+  background: none;
+  color: white;
+}
+
 .vote-count, .vote-up, .vote-down, .vote-up-clicked, .vote-down-clicked {
   font-size: 20px;
   align-items: center;
@@ -209,7 +220,7 @@ label {
   max-height: 20px;
 }
 
-.vote-up-clicked, .vote-down-clicked {
+.vote-up-clicked, .vote-down-clicked, .vote-up-clicked:hover, .vote-down-clicked:hover {
   color: orange;
 }
 
@@ -229,6 +240,7 @@ label {
 #add-form-content {
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
+  margin-top: 50%;
   padding: 20px;
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */

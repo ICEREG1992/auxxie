@@ -1,5 +1,6 @@
 var roomNum;
 var roomRef;
+var uID;
 var config = {
 	apiKey: "AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ",
 	authDomain: "auxxie-temp.firebaseapp.com",
@@ -9,8 +10,7 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
+// establish onclick code for the addForm popup, if you click outside the popup it hides
 window.onclick = function(event) {
   var formRef = document.getElementById('add-form');
   if (event.target == formRef) {
@@ -18,6 +18,10 @@ window.onclick = function(event) {
   }
 }
 
+// get the query (room number) from the url
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+// if it has the room number in it, get the room associated with that number, and join it
 if (!urlParams.has('n')) {
 	window.location.replace("https://auxxie-temp.firebaseapp.com/m/");
 } else {
@@ -30,6 +34,8 @@ if (!urlParams.has('n')) {
 	});
 }
 
+// functions
+
 function joinRoom() {
 	roomRef = database.ref('closedrooms/' + roomNum);
 	incrementUsers();
@@ -38,12 +44,11 @@ function joinRoom() {
 }
 
 function incrementUsers() {
-	roomRef.child('n').once("value").then(function(snapshot) {
-		var userCount = snapshot.val();
-		userCount++;
-		var update = {};
-		update['n'] = userCount;
-		roomRef.update(update);
+	roomRef.child('users').once("value").then(function(snapshot) {
+		var userCount = snapshot.numChildren();
+		uID = roomRef.child('users').push(userCount).key;
+		// set disconnect here so i don't have to worry about async values
+		roomRef.child('users').child(uID).onDisconnect().remove();
 	});
 }
 
@@ -83,18 +88,42 @@ function loadActiveQueue() {
 			votesElem.setAttribute('class', 'votes');
 
 			var upElem = document.createElement('button');
-			upElem.setAttribute('class', 'vote-up');
-			upElem.setAttribute('onclick', 'voteUp(this)');
+			var downElem = document.createElement('button');
+			if (vid.child('votes').child(uID).exists()) {
+				if (vid.child('votes').child(uID).val() == 0) {
+					upElem.setAttribute('class', 'vote-up');
+					upElem.setAttribute('onclick', 'voteUp(this)');
+					downElem.setAttribute('class', 'vote-down');
+					downElem.setAttribute('onclick', 'voteDown(this)');
+				} else if (vid.child('votes').child(uID).val() == 1) {
+					upElem.setAttribute('class', 'vote-up-clicked');
+					upElem.setAttribute('onclick', 'unvoteUp(this)');
+					downElem.setAttribute('class', 'vote-down');
+					downElem.setAttribute('onclick', 'voteDown(this)');
+				} else if (vid.child('votes').child(uID).val() == -1) {
+					upElem.setAttribute('class', 'vote-up');
+					upElem.setAttribute('onclick', 'voteUp(this)');
+					downElem.setAttribute('class', 'vote-down-clicked');
+					downElem.setAttribute('onclick', 'unvoteDown(this)');
+				}
+			} else {
+				upElem.setAttribute('class', 'vote-up');
+				upElem.setAttribute('onclick', 'voteUp(this)');
+				downElem.setAttribute('class', 'vote-down');
+				downElem.setAttribute('onclick', 'voteDown(this)');
+			}
+			
 			upElem.innerHTML = '▲';
+			downElem.innerHTML = '▼';
 
 			var countElem = document.createElement('div');
 			countElem.setAttribute('class', 'vote-count');
-			countElem.innerHTML = vid.child('votes').val();
-
-			var downElem = document.createElement('button');
-			downElem.setAttribute('class', 'vote-down');
-			downElem.setAttribute('onclick', 'voteDown(this)');
-			downElem.innerHTML = '▼';
+			// sum votes for that video
+			var sumVotes = 0;
+			vid.child('votes').forEach( function(child) {
+				sumVotes += child.val();
+			});
+			countElem.innerHTML = sumVotes;
 
 			//assembly
 
@@ -132,79 +161,91 @@ function closeAddForm() {
 }
 
 function voteUp(elem) {
+	// update room timeout since there's been activity
 	updateTimestamp();
-	var val = 1;
-	var downButton = elem.parentElement.children[0];
+	// if the downvote button has been clicked, unclick it so the top button will show as the only one clicked
+	var downButton = elem.parentElement.children[2];
 	if (downButton.getAttribute('class') == 'vote-down-clicked') {
 		downButton.setAttribute('class', 'vote-down');
-		val = 2;
+		downButton.setAttribute('onclick', 'voteDown(this)');
 	}
+	// get the video html element
 	var vid = elem.parentElement.parentElement;
+	// count the index of the video in the queue by seeing how many videos there are before it
 	var vidNumber;
 	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	// find that video index in the database, then update its votes element to include the user's uID
 	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
-		var tempVotes = snapshot.val();
-		tempVotes++;
+		// update the uID's vote number to 1, since this is an upvote
 		var update = {};
-		update['votes'] = tempVotes;
-		roomRef.child('videos').child(vidNumber).update(update);
+		update[uID] = 1
+		roomRef.child('videos').child(vidNumber).child('votes').update(update);
 	});
+	// show the upvote button as clicked, and set onclick to unvoteUp
 	elem.setAttribute('class', 'vote-up-clicked');
 	elem.setAttribute('onclick', 'unvoteUp(this)');
 }
 
 function voteDown(elem) {
+	// update room timeout since there's been activity
 	updateTimestamp();
-	var val = 1;
+	// if the downvote button has been clicked, unclick it so the top button will show as the only one clicked
 	var upButton = elem.parentElement.children[0];
 	if (upButton.getAttribute('class') == 'vote-up-clicked') {
 		upButton.setAttribute('class', 'vote-up');
-		val = 2;
+		upButton.setAttribute('onclick', 'voteUp(this)');
 	}
+	// get the video html element
 	var vid = elem.parentElement.parentElement;
-	var vidNumber = 0;
-	while((vid = vid.previousSibling) != null) {
-  		i++;
-	}
+	// count the index of the video in the queue by seeing how many videos there are before it
+	var vidNumber;
+	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	// find that video index in the database, then update its votes element to include the user's uID
 	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
-		var tempVotes = snapshot.val();
-		tempVotes -= val;
+		// update the uID's vote number to -1, since this is a downvote
 		var update = {};
-		update['votes'] = tempVotes;
-		roomRef.child('videos').child(vidNumber).update(update);
+		update[uID] = -1
+		roomRef.child('videos').child(vidNumber).child('votes').update(update);
 	});
+	// show the downvote button as clicked, and set onclick to unvoteDown
 	elem.setAttribute('class', 'vote-down-clicked');
 	elem.setAttribute('onclick', 'unvoteDown(this)');
 }
 
 function unvoteUp(elem) {
 	updateTimestamp();
+	// get the video html element
 	var vid = elem.parentElement.parentElement;
+	// count the index of the video in the queue by seeing how many videos there are before it
 	var vidNumber;
 	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	// find that video index in the database, then update its votes element to include the user's uID
 	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
-		var tempVotes = snapshot.val();
-		tempVotes--;
+		// update the uID's vote number to 0, since we;re removing any vote
 		var update = {};
-		update['votes'] = tempVotes;
-		roomRef.child('videos').child(vidNumber).update(update);
+		update[uID] = 0
+		roomRef.child('videos').child(vidNumber).child('votes').update(update);
 	});
+	// show the upvote button as unclicked, and set onclick to voteUp
 	elem.setAttribute('class', 'vote-up');
 	elem.setAttribute('onclick', 'voteUp(this)');
 }
 
 function unvoteDown(elem) {
 	updateTimestamp();
+	// get the video html element
 	var vid = elem.parentElement.parentElement;
+	// count the index of the video in the queue by seeing how many videos there are before it
 	var vidNumber;
 	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	// find that video index in the database, then update its votes element to include the user's uID
 	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
-		var tempVotes = snapshot.val();
-		tempVotes++;
+		// update the uID's vote number to 0, since we're removing any vote
 		var update = {};
-		update['votes'] = tempVotes;
-		roomRef.child('videos').child(vidNumber).update(update);
+		update[uID] = 0
+		roomRef.child('videos').child(vidNumber).child('votes').update(update);
 	});
+	// show the upvote button as unclicked, and set onclick to voteDown
 	elem.setAttribute('class', 'vote-down');
 	elem.setAttribute('onclick', 'voteDown(this)');
 }
