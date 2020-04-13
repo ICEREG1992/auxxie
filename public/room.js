@@ -35,7 +35,7 @@ function claimRoom() {
 			var videos = {};
 			update['/closedrooms/' + key + '/bgvideos/0/id'] = 'W9nZ6u15yis';
 			update['/closedrooms/' + key + '/videos/0/id'] = 'W9nZ6u15yis';
-			update['/closedrooms/' + key + '/videos/0/length'] = 10;
+			update['/closedrooms/' + key + '/videos/0/length'] = 'PT10S';
 			update['/closedrooms/' + key + '/videos/0/title'] = 'Black Screen 10 seconds HD';
 			update['/closedrooms/' + key + '/videos/0/author'] = 'Harrison Suderman';
 			update['/closedrooms/' + key + '/timestamp'] = Date.now();

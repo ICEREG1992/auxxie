@@ -24,9 +24,9 @@
   		    <button id='add-form-close' onclick="closeAddForm()">✕</button>
   		  </div>
   		  <div>
-  		    <form id='add-form-form' onsubmit="addToQueue(); return false;">
+  		    <form id='add-form-form' onsubmit="submitAddForm(); return false;">
   		  	  <input type='url' id='add-form-textbox'>
-  		  	  <input type='button' id='add-form-submit' onclick="addToQueue()" value="add video">
+  		  	  <input type='button' id='add-form-submit' onclick="submitAddForm()" value="add video">
   		    </form>
   		  </div>
       	</div>
@@ -41,6 +41,8 @@
 	<!-- Add Firebase products that you want to use -->
 	<script src="/__/firebase/7.11.0/firebase-auth.js"></script>
 	<script src="/__/firebase/7.11.0/firebase-database.js"></script>
+	<script src="https://apis.google.com/js/api.js"></script>
+	<script src="/lib/moment.min.js"></script>
 	<script src="/m/mroom.js"></script>
   </body>
 </html>

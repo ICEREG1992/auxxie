@@ -34,7 +34,29 @@ if (!urlParams.has('n')) {
 	});
 }
 
+// authenticate the youtube data api
+gapi.load('auth2', function() {
+	gapi.auth2.init({
+		client_id: '287328403783-5umbm14cbunh5dqpj3edk26fmb7h17jf.apps.googleusercontent.com'
+	}).then(function (authInstance) {
+		authenticate().then(loadClient);
+	});
+})
+
 // functions
+
+function authenticate() {
+	return gapi.auth2.getAuthInstance().signIn({scope: "https://www.googleapis.com/auth/youtube.readonly"})
+	.then(function() { console.log("Sign-in successful"); },
+		function(err) { console.error("Error signing in to API", err); });
+}
+
+function loadClient() {
+	gapi.client.setApiKey("AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ"); // my Browser key in Google API console
+	return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
+		.then(function() { console.log("GAPI client loaded for API"); },
+			function(err) { console.error("Error loading gAPI client for API", err); });
+}
 
 function joinRoom() {
 	roomRef = database.ref('closedrooms/' + roomNum);
@@ -82,7 +104,7 @@ function loadActiveQueue() {
 
 			var lengthElem = document.createElement('div');
 			lengthElem.setAttribute('class', 'vid-length');
-			lengthElem.innerHTML = timeFormat(vid.child('length').val());
+			lengthElem.innerHTML = moment().duration(vid.child('length').val()).format('hh:mm:ss');
 
 			var votesElem = document.createElement('div');
 			votesElem.setAttribute('class', 'votes');
@@ -158,6 +180,36 @@ function openAddForm() {
 function closeAddForm() {
 	var formRef = document.getElementById('add-form');
 	formRef.style.display = "none";
+}
+
+function submitAddForm() {
+	var inputElem = document.getElementById("add-form-textbox");
+	var inputUrl = inputElem.value;
+	var id = getId(inputUrl);
+	roomRef.child('videos').once('value').then(function (snapshot) {
+		var index = snapshot.numChildren();
+		roomRef.child('videos').child(index).update(getData(id));
+	})
+}
+
+function getId(url) {
+	var regex = '^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]+).*';
+	var r = url.match(regex);
+	return r[1];
+}
+
+function getData(id) {
+	var data = {};
+	gapi.client.youtube.videos.list({
+		"part": "snippet,contentDetails",
+		"id": id
+	}).then(function(response) {
+		data["author"] = response.snippet.channelTitle;
+		data["id"] = response.id;
+		data["length"] = response.contentDetails.duration;
+		data["title"] = response.snippet.title;
+	})
+	return data;
 }
 
 function voteUp(elem) {
@@ -248,20 +300,4 @@ function unvoteDown(elem) {
 	// show the upvote button as unclicked, and set onclick to voteDown
 	elem.setAttribute('class', 'vote-down');
 	elem.setAttribute('onclick', 'voteDown(this)');
-}
-
-function timeFormat(time)
-{   
-    // Hours, minutes and seconds
-    var hrs = ~~(time / 3600);
-    var mins = ~~((time % 3600) / 60);
-    var secs = ~~time % 60;
-    // Output like "1:01" or "4:03:59" or "123:03:59"
-    var ret = "";
-    if (hrs > 0) {
-        ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
-    }
-    ret += "" + mins + ":" + (secs < 10 ? "0" : "");
-    ret += "" + secs;
-    return ret;
 }
