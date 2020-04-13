@@ -39,17 +39,11 @@ gapi.load('auth2', function() {
 	gapi.auth2.init({
 		client_id: '287328403783-5umbm14cbunh5dqpj3edk26fmb7h17jf.apps.googleusercontent.com'
 	}).then(function (authInstance) {
-		authenticate().then(loadClient);
+		loadClient();
 	});
 })
 
 // functions
-
-function authenticate() {
-	return gapi.auth2.getAuthInstance().signIn({scope: "https://www.googleapis.com/auth/youtube.readonly"})
-	.then(function() { console.log("Sign-in successful"); },
-		function(err) { console.error("Error signing in to API", err); });
-}
 
 function loadClient() {
 	gapi.client.setApiKey("AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ"); // my Browser key in Google API console
@@ -104,7 +98,7 @@ function loadActiveQueue() {
 
 			var lengthElem = document.createElement('div');
 			lengthElem.setAttribute('class', 'vid-length');
-			lengthElem.innerHTML = moment().duration(vid.child('length').val()).format('hh:mm:ss');
+			lengthElem.innerHTML = moment.utc(moment.duration(vid.child('length').val()).as('milliseconds')).format('HH:mm:ss')
 
 			var votesElem = document.createElement('div');
 			votesElem.setAttribute('class', 'votes');
@@ -112,21 +106,21 @@ function loadActiveQueue() {
 			var upElem = document.createElement('button');
 			var downElem = document.createElement('button');
 			if (vid.child('votes').child(uID).exists()) {
-				if (vid.child('votes').child(uID).val() == 0) {
-					upElem.setAttribute('class', 'vote-up');
-					upElem.setAttribute('onclick', 'voteUp(this)');
-					downElem.setAttribute('class', 'vote-down');
-					downElem.setAttribute('onclick', 'voteDown(this)');
-				} else if (vid.child('votes').child(uID).val() == 1) {
-					upElem.setAttribute('class', 'vote-up-clicked');
-					upElem.setAttribute('onclick', 'unvoteUp(this)');
-					downElem.setAttribute('class', 'vote-down');
-					downElem.setAttribute('onclick', 'voteDown(this)');
-				} else if (vid.child('votes').child(uID).val() == -1) {
-					upElem.setAttribute('class', 'vote-up');
-					upElem.setAttribute('onclick', 'voteUp(this)');
-					downElem.setAttribute('class', 'vote-down-clicked');
-					downElem.setAttribute('onclick', 'unvoteDown(this)');
+				switch (vid.child('votes').child(uID).val()) {
+					case -1: upElem.setAttribute('class', 'vote-up');
+						upElem.setAttribute('onclick', 'voteUp(this)');
+						downElem.setAttribute('class', 'vote-down-clicked');
+						downElem.setAttribute('onclick', 'unvoteDown(this)');
+						break;
+					case 0: upElem.setAttribute('class', 'vote-up');
+						upElem.setAttribute('onclick', 'voteUp(this)');
+						downElem.setAttribute('class', 'vote-down');
+						downElem.setAttribute('onclick', 'voteDown(this)');
+						break;
+					case 1: upElem.setAttribute('class', 'vote-up-clicked');
+						upElem.setAttribute('onclick', 'unvoteUp(this)');
+						downElem.setAttribute('class', 'vote-down');
+						downElem.setAttribute('onclick', 'voteDown(this)');
 				}
 			} else {
 				upElem.setAttribute('class', 'vote-up');
@@ -185,11 +179,11 @@ function closeAddForm() {
 function submitAddForm() {
 	var inputElem = document.getElementById("add-form-textbox");
 	var inputUrl = inputElem.value;
-	var id = getId(inputUrl);
-	roomRef.child('videos').once('value').then(function (snapshot) {
-		var index = snapshot.numChildren();
-		roomRef.child('videos').child(index).update(getData(id));
-	})
+	getData(getId(inputUrl));
+	// roomRef.child('videos').once('value').then(function (snapshot) {
+	// 	var index = snapshot.numChildren();
+	// 	roomRef.child('videos').child(index).update(getData(id));
+	// })
 }
 
 function getId(url) {
@@ -202,14 +196,23 @@ function getData(id) {
 	var data = {};
 	gapi.client.youtube.videos.list({
 		"part": "snippet,contentDetails",
-		"id": id
+		"id": id,
+		"key": "AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ"
 	}).then(function(response) {
-		data["author"] = response.snippet.channelTitle;
-		data["id"] = response.id;
-		data["length"] = response.contentDetails.duration;
-		data["title"] = response.snippet.title;
-	})
-	return data;
+		if (response.result.items[0] !== undefined) {
+			data["author"] = response.result.items[0].snippet.channelTitle;
+			data["id"] = response.result.items[0].id;
+			data["length"] = response.result.items[0].contentDetails.duration;
+			data["title"] = response.result.items[0].snippet.title;
+
+			roomRef.child('videos').once('value').then(function (snapshot) {
+				var index = snapshot.numChildren();
+				roomRef.child('videos').child(index).update(data);
+			})
+		} else {
+			console.log("Youtube API was unable to load data id " + id + ".");
+		}
+	});
 }
 
 function voteUp(elem) {

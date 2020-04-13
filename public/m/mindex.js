@@ -42,7 +42,7 @@ function findRoom() {
 				setTimeout(function() {
 					labelElem.innerHTML = 'enter a room number';
 					labelElem.removeAttribute('class');
-				}, 5000);	
+				}, 5000);
 			}
 		}
 	});
