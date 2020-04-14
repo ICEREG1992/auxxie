@@ -111,6 +111,23 @@ function shuffle(arr) {
 
 //This video is going to get a function at a particular index
 function getVideoAtIndex(ind){
+		roomRef = database.ref('closedrooms/' + roomNum);
+		console.log('ROOM NUMBER: ' + roomNum);
+		var videoId; 
+		/*roomRef.child('videos').on('value', function(snapshot) {
+		
+		var vid = snapshot.child(ind);
+		videoID = vid.child('id').val();
+		console.log('Video id: ' + videoId);
+		startPlaylist(videoId);
+		});*/
+		
+		roomRef.child('videos').child(ind).on('value', function(snapshot){
+		videoId = snapshot.child('id').val();
+		console.log('Video id: ' + videoId);
+		startPlaylist(videoId);
+		});
+
 	
 }
 
@@ -151,13 +168,13 @@ function getVideoAtIndex(ind){
         player.loadVideoById(linkArray[index]);
       }
 
-      function startPlaylist() {
+      function startPlaylist(myId) {
         player = null;
         index = 0;
         player = new YT.Player('ytplayer', {
           height: '360',
           width: '640',
-          videoId: 'UxIoZ1omTKY',
+          videoId: myId,
           events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
