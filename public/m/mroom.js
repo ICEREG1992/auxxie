@@ -70,15 +70,16 @@ function incrementUsers() {
 
 function loadActiveQueue() {
 	var queueElem = document.getElementById('queue');
-	roomRef.child('videos').on('value', function(snapshot) {
+	roomRef.child('videos').orderByChild('votecount').on('value', function(snapshot) {
+		// clear the current html queue
 		while (queueElem.firstChild) {
     		queueElem.removeChild(queueElem.lastChild);
  		}
-		var vidCount = snapshot.numChildren();
-		for (var i = 0; i < vidCount; i++) {
-			var vid = snapshot.child(i);
-			var entryElem = document.createElement('div');
+ 		snapshot.forEach(function(vid) {
+ 			console.log(vid.val());
+ 			var entryElem = document.createElement('div');
 			entryElem.setAttribute('class', 'entry');
+			entryElem.setAttribute('id', vid.key);
 
 			var thumbElem = document.createElement('div');
 			thumbElem.setAttribute('class', 'thumbnail');
@@ -156,7 +157,7 @@ function loadActiveQueue() {
 			entryElem.appendChild(votesElem);
 
 			queueElem.appendChild(entryElem);
-		}
+ 		});
 	});
 }
 
@@ -204,9 +205,10 @@ function getData(id) {
 			data["id"] = response.result.items[0].id;
 			data["length"] = response.result.items[0].contentDetails.duration;
 			data["title"] = response.result.items[0].snippet.title;
+			data["votecount"] = 0;
 
 			roomRef.child('videos').once('value').then(function (snapshot) {
-				var index = snapshot.numChildren();
+				var index = Date.now();
 				roomRef.child('videos').child(index).update(data);
 			})
 		} else {
@@ -224,17 +226,20 @@ function voteUp(elem) {
 		downButton.setAttribute('class', 'vote-down');
 		downButton.setAttribute('onclick', 'voteDown(this)');
 	}
-	// get the video html element
-	var vid = elem.parentElement.parentElement;
-	// count the index of the video in the queue by seeing how many videos there are before it
-	var vidNumber;
-	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	// get the id of the video in the queue
+	var vidNumber = elem.parentElement.parentElement.getAttribute('id');
 	// find that video index in the database, then update its votes element to include the user's uID
 	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
 		// update the uID's vote number to 1, since this is an upvote
 		var update = {};
 		update[uID] = 1
 		roomRef.child('videos').child(vidNumber).child('votes').update(update);
+	}).then(function(e) {
+		countVotes(vidNumber).then(function(val) {
+			var update = {};
+			update['votecount'] = val;
+			roomRef.child('videos').child(vidNumber).update(update);
+		});
 	});
 	// show the upvote button as clicked, and set onclick to unvoteUp
 	elem.setAttribute('class', 'vote-up-clicked');
@@ -250,17 +255,20 @@ function voteDown(elem) {
 		upButton.setAttribute('class', 'vote-up');
 		upButton.setAttribute('onclick', 'voteUp(this)');
 	}
-	// get the video html element
-	var vid = elem.parentElement.parentElement;
-	// count the index of the video in the queue by seeing how many videos there are before it
-	var vidNumber;
-	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	// get the id of the video in the queue
+	var vidNumber = elem.parentElement.parentElement.getAttribute('id');
 	// find that video index in the database, then update its votes element to include the user's uID
 	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
 		// update the uID's vote number to -1, since this is a downvote
 		var update = {};
 		update[uID] = -1
 		roomRef.child('videos').child(vidNumber).child('votes').update(update);
+	}).then(function(e) {
+		countVotes(vidNumber).then(function(val) {
+			var update = {};
+			update['votecount'] = val;
+			roomRef.child('videos').child(vidNumber).update(update);
+		});
 	});
 	// show the downvote button as clicked, and set onclick to unvoteDown
 	elem.setAttribute('class', 'vote-down-clicked');
@@ -271,15 +279,20 @@ function unvoteUp(elem) {
 	updateTimestamp();
 	// get the video html element
 	var vid = elem.parentElement.parentElement;
-	// count the index of the video in the queue by seeing how many videos there are before it
-	var vidNumber;
-	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	// get the id of the video in the queue
+	var vidNumber = elem.parentElement.parentElement.getAttribute('id');
 	// find that video index in the database, then update its votes element to include the user's uID
 	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
 		// update the uID's vote number to 0, since we;re removing any vote
 		var update = {};
 		update[uID] = 0
 		roomRef.child('videos').child(vidNumber).child('votes').update(update);
+	}).then(function(e) {
+		countVotes(vidNumber).then(function(val) {
+			var update = {};
+			update['votecount'] = val;
+			roomRef.child('videos').child(vidNumber).update(update);
+		});
 	});
 	// show the upvote button as unclicked, and set onclick to voteUp
 	elem.setAttribute('class', 'vote-up');
@@ -290,17 +303,35 @@ function unvoteDown(elem) {
 	updateTimestamp();
 	// get the video html element
 	var vid = elem.parentElement.parentElement;
-	// count the index of the video in the queue by seeing how many videos there are before it
-	var vidNumber;
-	for (vidNumber = 0; (vid = vid.previousSibling); vidNumber++);
+	// get the id of the video in the queue
+	var vidNumber = elem.parentElement.parentElement.getAttribute('id');
 	// find that video index in the database, then update its votes element to include the user's uID
 	roomRef.child('videos').child(vidNumber).child('votes').once('value').then(function(snapshot) {
 		// update the uID's vote number to 0, since we're removing any vote
 		var update = {};
-		update[uID] = 0
+		update[uID] = 0;
 		roomRef.child('videos').child(vidNumber).child('votes').update(update);
+	}).then(function(e) {
+		countVotes(vidNumber).then(function(val) {
+			var update = {};
+			update['votecount'] = val;
+			roomRef.child('videos').child(vidNumber).update(update);
+		});
 	});
+	
 	// show the upvote button as unclicked, and set onclick to voteDown
 	elem.setAttribute('class', 'vote-down');
 	elem.setAttribute('onclick', 'voteDown(this)');
+}
+
+function countVotes(vid) {
+	return new Promise(function (resolve, reject) {
+		var sumVotes = 0;
+		roomRef.child('videos').child(vid).child('votes').once('value').then(function (snapshot) {
+			snapshot.forEach( function(child) {
+				sumVotes -= child.val();
+			});
+			resolve(sumVotes);
+		});
+	})
 }

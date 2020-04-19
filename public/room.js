@@ -1,7 +1,8 @@
 var roomNum;
-var roomref;
-var currIndex;
-currIndex = 0;
+var roomRef;
+var linkArray = [];
+var index = 0;
+var playing = true;
 
 var config = {
 	apiKey: "AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ",
@@ -12,34 +13,39 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 
+// Load the IFrame Player API code
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+var player;
+
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 
 
-//Claims the room if it is empty, otherwise populates the elements welcoming user to current room
+// Claims the room if it is empty, otherwise populates the elements welcoming user to current room
 if (!urlParams.has('n')) {
 	claimRoom();
 } else {
 	roomNum = urlParams.get('n');
-	document.getElementById('roomtitle').innerHTML = 'welcome to room ' + roomNum;
+	roomRef = database.ref('/closedrooms/' + roomNum);
+	document.getElementById('room-title').innerHTML = 'room ' + roomNum;
+	document.getElementById('link-info').innerHTML = 'go to<br><b>auxxie-temp.firebaseapp.com/r/' + roomNum + '</b><br>to join'
 }
-
-
-// functions //
-
 
 // authenticate the youtube data api
 gapi.load('auth2', function() {
 	gapi.auth2.init({
 		client_id: '287328403783-5umbm14cbunh5dqpj3edk26fmb7h17jf.apps.googleusercontent.com'
 	}).then(function (authInstance) {
-		loadClient();
+		loadApiClient();
 	});
 })
 
-// functions
-//Load the client
-function loadClient() {
+// functions //
+
+function loadApiClient() {
 	gapi.client.setApiKey("AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ"); // my Browser key in Google API console
 	return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
 		.then(function() { console.log("GAPI client loaded for API"); },
@@ -51,27 +57,27 @@ function claimRoom() {
 	var ticket = database.ref('/openrooms').limitToFirst(1)
 	ticket.once('value').then(function(snapshot) {
 		for (var key in snapshot.val()) {
-			document.getElementById('roomtitle').innerHTML = 'welcome to room ' + snapshot.val()[key];
+			// remove pair from openrooms
+			database.ref('/openrooms').child(key).remove();
+			// this was really only added to make sure the db query was working
+			document.getElementById('room-title').innerHTML = 'welcome to room ' + snapshot.val()[key];
 			
-			// add pair to closedrooms
+			// create closedrooms entry in the update map
 			var update = {};
 			var bgvideos = {};
 			var videos = {};
 			update['/closedrooms/' + key + '/bgvideos/0/id'] = 'W9nZ6u15yis';
-			update['/closedrooms/' + key + '/videos/0/id'] = 'W9nZ6u15yis';
-			update['/closedrooms/' + key + '/videos/0/length'] = 'PT10S';
-			update['/closedrooms/' + key + '/videos/0/title'] = 'Black Screen 10 seconds HD';
-			update['/closedrooms/' + key + '/videos/0/author'] = 'Harrison Suderman';
+			//update['/closedrooms/' + key + '/videos/0/id'] = 'W9nZ6u15yis';
+			// update['/closedrooms/' + key + '/videos/0/length'] = 'PT10S';
+			// update['/closedrooms/' + key + '/videos/0/title'] = 'Black Screen 10 seconds HD';
+			// update['/closedrooms/' + key + '/videos/0/author'] = 'Harrison Suderman';
 			update['/closedrooms/' + key + '/timestamp'] = Date.now();
 			update['/closedrooms/' + key + '/key'] = snapshot.val()[key];
 			update['/closedrooms/' + key + '/users/host'] = 0;
+			// push the update and change the room's roomRef to the appropriate database ref
 			database.ref().update(update);
-			roomref = '/closedrooms/' + key;
 
-			// remove pair from openrooms
-			database.ref('/openrooms').child(key).remove();
 			window.location.replace("https://auxxie-temp.firebaseapp.com/room?n=" + paddy(key, 6));
-			// no return, the redirect nukes all js
 		}
 	});
 }
@@ -93,10 +99,6 @@ function paddy(num, padlen, padchar) {
     return (pad + num).slice(-pad.length);
 }
 
-
-
-
-
 // shuffles array and returns it
 function shuffle(arr) {
 	let i, j ,tmp;
@@ -111,126 +113,102 @@ function shuffle(arr) {
 
 //This video is going to get a function at a particular index
 function getVideoAtIndex(ind){
-		roomRef = database.ref('closedrooms/' + roomNum);
-		console.log('ROOM NUMBER: ' + roomNum);
-		var videoId; 
-		/*roomRef.child('videos').on('value', function(snapshot) {
-		
-		var vid = snapshot.child(ind);
-		videoID = vid.child('id').val();
-		console.log('Video id: ' + videoId);
-		startPlaylist(videoId);
-		});*/
-		
-		roomRef.child('videos').child(ind).on('value', function(snapshot){
+	var videoId; 
+	roomRef.child('videos').child(ind).on('value', function(snapshot){
 		videoId = snapshot.child('id').val();
 		console.log('Video id: ' + videoId);
 		startPlaylist(videoId);
-		});
-
-	
+	});
+}
+      
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+		height: '390',
+		width: '640',
+		videoId: 'u1zgFlCw8Aw',
+		events: {
+			'onReady': onPlayerReady,
+			'onStateChange': onPlayerStateChange
+		}
+    });
+}
+      
+function onPlayerReady(event) {
+	event.target.playVideo();
+}
+     
+function onPlayerStateChange(event) {
+	if (event.data == YT.PlayerState.ENDED && playing) {
+		playing = false;
+		nextVideo();
+	}
 }
 
-      // Load the IFrame Player API code asynchronously.
-      var tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      var player;
+function nextVideo() {
+	//player.cueVideoById('chd31lOa6xg');
+	index++;
+	if(index > linkArray.length - 1){
+		index = 0;
+	}
+	player.loadVideoById(linkArray[index]);
+}
 
-      var linkArray = [];
-      var index = 0;
-      
-      function onYouTubeIframeAPIReady() {
-        //if (linkArray.length != 0) {
-          document.getElementById("start").removeAttribute("disabled");
-        //}
-      }
-      
-      function onPlayerReady(event) {
-        event.target.playVideo();
-      }
-      
-      var playing = true;
-      function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.ENDED && playing) {
-          playing = false;
-          nextVideo();
-        }
-      }
-
-      function nextVideo() {
-        //player.cueVideoById('chd31lOa6xg');
-        index++;
-        if(index > linkArray.length - 1){
-          index = 0;
-        }
-        player.loadVideoById(linkArray[index]);
-      }
-
-      function startPlaylist(myId) {
-        player = null;
-        index = 0;
-        player = new YT.Player('ytplayer', {
-          height: '360',
-          width: '640',
-          videoId: myId,
-          events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-          }
-        });
-      }
-
-      // Create an array to hold the links
-      
-      function pushValue() {
-        // Get value from the input box
-        var inputText = document.getElementById('linkInput').value;
-        
-        if (inputText != ""){
-          // Simple parsing on input link
-          if (inputText.includes("watch?v=")) {
-            var inputTextParsed = inputText.substr(inputText.indexOf("v=") + 2, 11);
-          }
-          // append data to the array
-          linkArray.push(inputTextParsed);
-          document.getElementById('linkInput').value = '';
-        }
-    
-		DisplayLinkList();
-      }
-
-
-	  function DisplayLinkList(){
-	  	 // Simple code so I can see the array list
-        var pval = "";
-        for(i = 0; i < linkArray.length; i++) {
-          pval = pval + linkArray[i] + "<br/>";
-        }
-    
-        // display array data
-        document.getElementById('pText').innerHTML = pval;
-	  }
-
-
-	  //Function stolen from the randomizer that im gonna use to shuffle the array
-	  function shuffle(d) {
-			var a, c, b = d.length;
-			if (b) {
-				while (--b) {
-					c = Math.floor(Math.random() * (b + 1));
-					a = d[c];
-					d[c] = d[b];
-					d[b] = a
-				}
-			}
-			return d;
-			
+function startPlaylist(myId) {
+	player = null;
+	index = 0;
+	player = new YT.Player('ytplayer', {
+		height: '360',
+		width: '640',
+		videoId: myId,
+		events: {
+			'onReady': onPlayerReady,
+			'onStateChange': onPlayerStateChange
 		}
+	});
+}
 
-		function randomize_videos() {
-			linkArray = shuffle(linkArray);
-			index = 0;
-			DisplayLinkList();
+function pushValue() {
+	// Get value from the input box
+	var inputText = document.getElementById('linkInput').value;
+
+	if (inputText != ""){
+		// Simple parsing on input link
+		if (inputText.includes("watch?v=")) {
+			var inputTextParsed = inputText.substr(inputText.indexOf("v=") + 2, 11);
 		}
+		// append data to the array
+		linkArray.push(inputTextParsed);
+		document.getElementById('linkInput').value = '';
+	}
+	DisplayLinkList();
+}
+
+// Simple code so I can see the array list
+function DisplayLinkList() {
+	var pval = "";
+	for(i = 0; i < linkArray.length; i++) {
+		pval = pval + linkArray[i] + "<br/>";
+	}
+	// display array data
+	document.getElementById('pText').innerHTML = pval;
+}
+
+// Function stolen from the randomizer that im gonna use to shuffle the array
+function shuffle(d) {
+	var a, c, b = d.length;
+	if (b) {
+		while (--b) {
+			c = Math.floor(Math.random() * (b + 1));
+			a = d[c];
+			d[c] = d[b];
+			d[b] = a
+		}
+	}
+	return d;
+}
+
+function randomize_videos() {
+	linkArray = shuffle(linkArray);
+	index = 0;
+	DisplayLinkList();
+}
