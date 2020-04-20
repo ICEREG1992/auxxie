@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <link rel="stylesheet" type = "text/css" href = "site.css">
+    <title>
+      auxxie - create a room
+    </title>
+    <meta charset="utf-8" /> 
+  </head>
+  <body>
+    <a href='./'>create a room</a>
+    <p id='info'>let your friends know they're mising out</p>
+    <hr>
+    <div id='playlist-form'>
+      <div id='playlist-form-instructions'>enter a youtube playlist link for your background playlist</div>
+      <form id='playlist-form-form' onsubmit="submitPlaylistForm(); return false;">
+        <input type='url' id='playlist-form-textbox'>
+        <input type='button' id='playlist-form-submit' onclick="submitPlaylistForm()" value="add video">
+      </form>
+    </div>
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+  	<script src="/__/firebase/7.11.0/firebase-app.js"></script>
+  	<!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+  	<script src="/__/firebase/7.11.0/firebase-analytics.js"></script>
+  	<!-- Add Firebase products that you want to use -->
+  	<script src="/__/firebase/7.11.0/firebase-auth.js"></script>
+  	<script src="/__/firebase/7.11.0/firebase-database.js"></script>
+    <!-- Youtube Data API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://apis.google.com/js/client:plusone.js" type="application/javascript"></script>
+    <!-- Our code -->
+    <script src="create.js"></script>
+  </body>
+</html>

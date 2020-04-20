@@ -280,3 +280,7 @@ label {
   flex-direction: row;
   align-items: center;
 }
+
+#playlist-form-instructions {
+  padding: 10px 0px;
+}

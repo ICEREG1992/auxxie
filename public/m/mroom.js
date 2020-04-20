@@ -75,8 +75,8 @@ function loadActiveQueue() {
 		while (queueElem.firstChild) {
     		queueElem.removeChild(queueElem.lastChild);
  		}
+ 		// for each video in the queue, build a queue entry element, pulling all necessary info from the data snapshot
  		snapshot.forEach(function(vid) {
- 			console.log(vid.val());
  			var entryElem = document.createElement('div');
 			entryElem.setAttribute('class', 'entry');
 			entryElem.setAttribute('id', vid.key);
@@ -99,6 +99,7 @@ function loadActiveQueue() {
 
 			var lengthElem = document.createElement('div');
 			lengthElem.setAttribute('class', 'vid-length');
+			// the length value is given by the youtube data api as an ISO 8601 duration. we store that and only convert it for view here.
 			lengthElem.innerHTML = moment.utc(moment.duration(vid.child('length').val()).as('milliseconds')).format('HH:mm:ss')
 
 			var votesElem = document.createElement('div');
@@ -106,6 +107,7 @@ function loadActiveQueue() {
 
 			var upElem = document.createElement('button');
 			var downElem = document.createElement('button');
+			// if a user has voted on a video, we need to remember that so the buttons for a certain video stay clicked as the queue moves
 			if (vid.child('votes').child(uID).exists()) {
 				switch (vid.child('votes').child(uID).val()) {
 					case -1: upElem.setAttribute('class', 'vote-up');
@@ -135,12 +137,9 @@ function loadActiveQueue() {
 
 			var countElem = document.createElement('div');
 			countElem.setAttribute('class', 'vote-count');
-			// sum votes for that video
-			var sumVotes = 0;
-			vid.child('votes').forEach( function(child) {
-				sumVotes += child.val();
-			});
-			countElem.innerHTML = sumVotes;
+			// we used to sum the whole votes entry in the db for this, but now we can just pull votecount.
+			// probably more lightweight now that we're just summing one vid on vote click and not all vids on every change to the db
+			countElem.innerHTML = vid.child('votecount').val();
 
 			//assembly
 
@@ -181,13 +180,10 @@ function submitAddForm() {
 	var inputElem = document.getElementById("add-form-textbox");
 	var inputUrl = inputElem.value;
 	getData(getId(inputUrl));
-	// roomRef.child('videos').once('value').then(function (snapshot) {
-	// 	var index = snapshot.numChildren();
-	// 	roomRef.child('videos').child(index).update(getData(id));
-	// })
 }
 
 function getId(url) {
+	// big complicated regex that i stole off stack overflow
 	var regex = '^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]+).*';
 	var r = url.match(regex);
 	return r[1];
@@ -212,7 +208,7 @@ function getData(id) {
 				roomRef.child('videos').child(index).update(data);
 			})
 		} else {
-			console.log("Youtube API was unable to load data id " + id + ".");
+			console.error("Youtube API was unable to load data id " + id + ".");
 		}
 	});
 }
@@ -235,6 +231,7 @@ function voteUp(elem) {
 		update[uID] = 1
 		roomRef.child('videos').child(vidNumber).child('votes').update(update);
 	}).then(function(e) {
+		// then after that is done, update the sum votecount in the db
 		countVotes(vidNumber).then(function(val) {
 			var update = {};
 			update['votecount'] = val;
@@ -264,6 +261,7 @@ function voteDown(elem) {
 		update[uID] = -1
 		roomRef.child('videos').child(vidNumber).child('votes').update(update);
 	}).then(function(e) {
+		// then after that is done, update the sum votecount in the db
 		countVotes(vidNumber).then(function(val) {
 			var update = {};
 			update['votecount'] = val;
@@ -288,6 +286,7 @@ function unvoteUp(elem) {
 		update[uID] = 0
 		roomRef.child('videos').child(vidNumber).child('votes').update(update);
 	}).then(function(e) {
+		// then after that is done, update the sum votecount in the db
 		countVotes(vidNumber).then(function(val) {
 			var update = {};
 			update['votecount'] = val;
@@ -312,6 +311,7 @@ function unvoteDown(elem) {
 		update[uID] = 0;
 		roomRef.child('videos').child(vidNumber).child('votes').update(update);
 	}).then(function(e) {
+		// then after that is done, update the sum votecount in the db
 		countVotes(vidNumber).then(function(val) {
 			var update = {};
 			update['votecount'] = val;
@@ -329,6 +329,8 @@ function countVotes(vid) {
 		var sumVotes = 0;
 		roomRef.child('videos').child(vid).child('votes').once('value').then(function (snapshot) {
 			snapshot.forEach( function(child) {
+				// in order to sort in the correct direction, votecount needs to be negated
+				// so instead of adding all of the child.val()s together, they are subtracted
 				sumVotes -= child.val();
 			});
 			resolve(sumVotes);

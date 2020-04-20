@@ -25,13 +25,14 @@ const urlParams = new URLSearchParams(queryString);
 
 
 // Claims the room if it is empty, otherwise populates the elements welcoming user to current room
-if (!urlParams.has('n')) {
-	claimRoom();
-} else {
+if (urlParams.has('n')) {
 	roomNum = urlParams.get('n');
 	roomRef = database.ref('/closedrooms/' + roomNum);
 	document.getElementById('room-title').innerHTML = 'room ' + roomNum;
 	document.getElementById('link-info').innerHTML = 'go to<br><b>auxxie-temp.firebaseapp.com/r/' + roomNum + '</b><br>to join'
+} else {
+	document.getElementById("room-title").innerHTML = 'room error!';
+	document.getElementById('link-info').innerHTML = 'room not specified. head back to <br><b>auxxie-temp.firebaseapp.com</b><br>to create a new room.';
 }
 
 // authenticate the youtube data api
@@ -52,38 +53,9 @@ function loadApiClient() {
 			function(err) { console.error("Error loading gAPI client for API", err); });
 }
 
-//Claim the room if it has not yet been claimed
-function claimRoom() {
-	var ticket = database.ref('/openrooms').limitToFirst(1)
-	ticket.once('value').then(function(snapshot) {
-		for (var key in snapshot.val()) {
-			// remove pair from openrooms
-			database.ref('/openrooms').child(key).remove();
-			// this was really only added to make sure the db query was working
-			document.getElementById('room-title').innerHTML = 'welcome to room ' + snapshot.val()[key];
-			
-			// create closedrooms entry in the update map
-			var update = {};
-			var bgvideos = {};
-			var videos = {};
-			update['/closedrooms/' + key + '/bgvideos/0/id'] = 'W9nZ6u15yis';
-			//update['/closedrooms/' + key + '/videos/0/id'] = 'W9nZ6u15yis';
-			// update['/closedrooms/' + key + '/videos/0/length'] = 'PT10S';
-			// update['/closedrooms/' + key + '/videos/0/title'] = 'Black Screen 10 seconds HD';
-			// update['/closedrooms/' + key + '/videos/0/author'] = 'Harrison Suderman';
-			update['/closedrooms/' + key + '/timestamp'] = Date.now();
-			update['/closedrooms/' + key + '/key'] = snapshot.val()[key];
-			update['/closedrooms/' + key + '/users/host'] = 0;
-			// push the update and change the room's roomRef to the appropriate database ref
-			database.ref().update(update);
-
-			window.location.replace("https://auxxie-temp.firebaseapp.com/room?n=" + paddy(key, 6));
-		}
-	});
-}
-
 function writeOpenRooms(num) {
   database.ref('/openrooms').set({ 111111: '111111'});
+  database.ref('/closedrooms').set({});
   var update = {};
   for (var i = 111112; i < num + 111110; i++) {
   	var newRoomKey = database.ref('openrooms').push().key;    // { i: paddy(i, 6); }

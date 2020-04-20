@@ -24,30 +24,9 @@ var config = {
 	storageBucket: "auxxie-temp.appspot.com"
 };
 firebase.initializeApp(config);
-var database = firebase.database();
 randomizeTagline();
-
-function findRoom() {
-	//document.getElementById("roomInput").submit();
-	var inputNum = document.getElementById("roomInput").value;
-	database.ref('closedrooms/' + inputNum).once("value").then(function(snapshot) {
-		if (snapshot.exists() && inputNum != ''){
-			window.location = 'https://auxxie-temp.firebaseapp.com/r/' + inputNum;
-		} else {
-			var labelElem= document.getElementById('form-label');
-			if (document.body.contains(labelElem)) {
-				labelElem.innerHTML = 'invalid room number!';
-				labelElem.setAttribute('class', 'invalid');
-				setTimeout(function() {
-					labelElem.innerHTML = 'enter a room number';
-					labelElem.removeAttribute('class');
-				}, 5000);
-			}
-		}
-	});
-}
 
 function randomizeTagline() {
 	var tagline = taglines[Math.floor(Math.random() * taglines.length)];
-	document.getElementById('tagline').innerHTML = tagline;
+	document.getElementById('info').innerHTML = tagline;
 }
