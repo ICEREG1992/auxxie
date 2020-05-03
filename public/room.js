@@ -1,8 +1,6 @@
 var roomNum;
 var roomRef;
-var linkArray = [];
-var index = 0;
-var playing = true;
+var bgIndex = 0;
 
 var config = {
 	apiKey: "AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ",
@@ -44,6 +42,9 @@ gapi.load('auth2', function() {
 	});
 })
 
+// create and queue the iframe
+spawnFrame();
+
 // functions //
 
 function loadApiClient() {
@@ -54,15 +55,15 @@ function loadApiClient() {
 }
 
 function writeOpenRooms(num) {
-  database.ref('/openrooms').set({ 111111: '111111'});
-  database.ref('/closedrooms').set({});
-  var update = {};
-  for (var i = 111112; i < num + 111110; i++) {
-  	var newRoomKey = database.ref('openrooms').push().key;    // { i: paddy(i, 6); }
-  	newRoomKey = i;
-  	update['/openrooms/' + newRoomKey] = paddy(i, 6);
-  }
-  database.ref().update(update);
+	database.ref('/openrooms').set({ 111111: '111111'});
+	database.ref('/closedrooms').set({});
+	var update = {};
+	for (var i = 111112; i < num + 111110; i++) {
+		var newRoomKey = database.ref('openrooms').push().key;    // { i: paddy(i, 6); }
+		newRoomKey = i;
+		update['/openrooms/' + newRoomKey] = paddy(i, 6);
+	}
+	database.ref().update(update);
 }
 
 function paddy(num, padlen, padchar) {
@@ -75,112 +76,102 @@ function paddy(num, padlen, padchar) {
 function shuffle(arr) {
 	let i, j ,tmp;
 	for(i = arr.length -1; i >0;i--){
-		 j = Math.floor(Math.random()*(i+1));
-		 tmp = arr[i];
-		 arr[i] = arr[j];
-		 arr[j] = tmp;
+		j = Math.floor(Math.random()*(i+1));
+		tmp = arr[i];
+		arr[i] = arr[j];
+		arr[j] = tmp;
 	}
 	return arr;
 }
 
-//This video is going to get a function at a particular index
-function getVideoAtIndex(ind){
-	var videoId; 
-	roomRef.child('videos').child(ind).on('value', function(snapshot){
-		videoId = snapshot.child('id').val();
-		console.log('Video id: ' + videoId);
-		startPlaylist(videoId);
-	});
-}
-      
+// video functions //
+
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
 		height: '390',
 		width: '640',
 		videoId: 'u1zgFlCw8Aw',
+		playerVars: {
+			'autoplay': 1
+		},
 		events: {
 			'onReady': onPlayerReady,
 			'onStateChange': onPlayerStateChange
 		}
     });
 }
-      
+
 function onPlayerReady(event) {
-	event.target.playVideo();
+	if (event.target.getDuration() <= 0) {
+		console.log('Video likely to be removed');
+	} else {
+		event.target.playVideo();
+	}
 }
-     
+
 function onPlayerStateChange(event) {
-	if (event.data == YT.PlayerState.ENDED && playing) {
-		playing = false;
+	if (event.data == YT.PlayerState.ENDED) {
 		nextVideo();
 	}
 }
 
 function nextVideo() {
-	//player.cueVideoById('chd31lOa6xg');
-	index++;
-	if(index > linkArray.length - 1){
-		index = 0;
-	}
-	player.loadVideoById(linkArray[index]);
+	getNextVideo().then(function(id) {
+		player.loadVideoById(id);
+	})
 }
 
-function startPlaylist(myId) {
-	player = null;
-	index = 0;
-	player = new YT.Player('ytplayer', {
-		height: '360',
-		width: '640',
-		videoId: myId,
-		events: {
-			'onReady': onPlayerReady,
-			'onStateChange': onPlayerStateChange
-		}
+function getNextVideo() {
+	return new Promise(function (resolve, reject) {
+		// check if the queue has any videos in it
+		// if it does, play the video at the top of the queue
+		// if not, play the next video in bgvideos
+		roomRef.child('videos').limitToFirst(1).once('value').then(function(snapshot) {
+			if (snapshot.numChildren()) {
+				// if there is a video at the top of the queue, we get it through
+				// forEach so we don't have to know its key
+				snapshot.forEach(function(childSnapshot) {
+					roomRef.child('videos').child(childSnapshot.key).remove();
+					resolve(childSnapshot.child('id').val());
+				});
+			} else {
+				// if there's not a video in the queue, pluck one from bgvideos
+				roomRef.child('bgvideos').limitToFirst(1).once('value').then(function(bgSnapshot) {
+					if (bgSnapshot.numChildren()) {
+						bgSnapshot.forEach(function(childSnapshot) {
+							roomRef.child('bgvideos').child(childSnapshot.key).remove();
+							resolve(childSnapshot.val());
+						});
+					} else {
+						refreshBgvideos();
+					}
+				});
+			}
+		});
 	});
 }
 
-function pushValue() {
-	// Get value from the input box
-	var inputText = document.getElementById('linkInput').value;
-
-	if (inputText != ""){
-		// Simple parsing on input link
-		if (inputText.includes("watch?v=")) {
-			var inputTextParsed = inputText.substr(inputText.indexOf("v=") + 2, 11);
-		}
-		// append data to the array
-		linkArray.push(inputTextParsed);
-		document.getElementById('linkInput').value = '';
-	}
-	DisplayLinkList();
+function spawnFrame() {
+	player = null; // required?
+	getNextVideo().then(function(id) {
+		player = new YT.Player('ytplayer', {
+			height: '390',
+			width: '640',
+			videoId: id,
+			playerVars: {
+				'autoplay': 1
+			},
+			events: {
+				'onReady': onPlayerReady,
+				'onStateChange': onPlayerStateChange
+			}
+		});
+	});
 }
 
-// Simple code so I can see the array list
-function DisplayLinkList() {
-	var pval = "";
-	for(i = 0; i < linkArray.length; i++) {
-		pval = pval + linkArray[i] + "<br/>";
-	}
-	// display array data
-	document.getElementById('pText').innerHTML = pval;
-}
-
-// Function stolen from the randomizer that im gonna use to shuffle the array
-function shuffle(d) {
-	var a, c, b = d.length;
-	if (b) {
-		while (--b) {
-			c = Math.floor(Math.random() * (b + 1));
-			a = d[c];
-			d[c] = d[b];
-			d[b] = a
-		}
-	}
-	return d;
-}
-
-function randomize_videos() {
-	linkArray = shuffle(linkArray);
-	index = 0;
-	DisplayLinkList();
+function refreshBgvideos() {
+	console.log("out of videos! figure out how to avoid this later.");
+	// ideally you'd want to reload the playlist but we're not currently
+	// saving that. so we may need to add that to our database structure, or
+	// change how we're deleting videos from the db.
 }
