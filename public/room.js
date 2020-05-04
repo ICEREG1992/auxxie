@@ -1,7 +1,7 @@
 var roomNum;
 var roomRef;
-var bgIndex = 0;
 
+// load the firebase code
 var config = {
 	apiKey: "AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ",
 	authDomain: "auxxie-temp.firebaseapp.com",
@@ -11,39 +11,39 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 
-// Load the IFrame Player API code
-var tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-var player;
-
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-
-
-// Claims the room if it is empty, otherwise populates the elements welcoming user to current room
-if (urlParams.has('n')) {
-	roomNum = urlParams.get('n');
-	roomRef = database.ref('/closedrooms/' + roomNum);
-	document.getElementById('room-title').innerHTML = 'room ' + roomNum;
-	document.getElementById('link-info').innerHTML = 'go to<br><b>auxxie-temp.firebaseapp.com/r/' + roomNum + '</b><br>to join'
-} else {
-	document.getElementById("room-title").innerHTML = 'room error!';
-	document.getElementById('link-info').innerHTML = 'room not specified. head back to <br><b>auxxie-temp.firebaseapp.com</b><br>to create a new room.';
-}
-
-// authenticate the youtube data api
+// load and authenticate the youtube data api
 gapi.load('auth2', function() {
 	gapi.auth2.init({
 		client_id: '287328403783-5umbm14cbunh5dqpj3edk26fmb7h17jf.apps.googleusercontent.com'
 	}).then(function (authInstance) {
 		loadApiClient();
 	});
-})
+});
 
-// create and queue the iframe
-spawnFrame();
+// load the IFrame Player API code
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+var player;
+
+// get all queries from the url
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+// if the url has a room number, set roomRef to its spot in the db, then populate the website
+if (urlParams.has('n')) {
+	roomNum = urlParams.get('n');
+	roomRef = database.ref('/closedrooms/' + roomNum);
+	document.getElementById('room-title').innerHTML = 'room ' + roomNum;
+	document.getElementById('link-info').innerHTML = 'go to<br><b>auxxie-temp.firebaseapp.com/r/' + roomNum + '</b><br>to join'
+} else { // otherwise throw error
+	document.getElementById("room-title").innerHTML = 'room error!';
+	document.getElementById('link-info').innerHTML = 'room not specified. head back to <br><b>auxxie-temp.firebaseapp.com</b><br>to create a new room.';
+}
+
+// load the active viewercount
+loadActiveCount();
+
 
 // functions //
 
@@ -51,7 +51,15 @@ function loadApiClient() {
 	gapi.client.setApiKey("AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ"); // my Browser key in Google API console
 	return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
 		.then(function() { console.log("GAPI client loaded for API"); },
-			function(err) { console.error("Error loading gAPI client for API", err); });
+			function(err) { console.error("Error loading GAPI client for API", err); })
+		.then(function() { spawnFrame(); });
+}
+
+function loadActiveCount() {
+	numElem = document.getElementById('viewer-number');
+	roomRef.child('users').on('value', function(snapshot) {
+		numElem.innerHTML = snapshot.numChildren();
+	});
 }
 
 function writeOpenRooms(num) {
@@ -104,12 +112,7 @@ function nextVideo() {
 	getNextVideo().then(function(id) {
 		player.loadVideoById(id);
 	});
-	setTimeout(function() {
-		if (player.getPlayerState() == -1) {
-			console.log("This video is probably unavaibale... skipping...");
-			nextVideo();
-		}
-	}, 3000);
+	checkUnavailable();
 }
 
 function getNextVideo() {
@@ -123,6 +126,7 @@ function getNextVideo() {
 				// forEach so we don't have to know its key
 				snapshot.forEach(function(childSnapshot) {
 					roomRef.child('videos').child(childSnapshot.key).remove();
+					document.getElementById('vid-info-text').innerHTML = "now playing: <b>" + childSnapshot.child('title').val() + "</b> by <b>" + childSnapshot.child('author').val() + "</b>";
 					resolve(childSnapshot.child('id').val());
 				});
 			} else {
@@ -131,7 +135,9 @@ function getNextVideo() {
 					if (bgSnapshot.numChildren()) {
 						bgSnapshot.forEach(function(childSnapshot) {
 							roomRef.child('bgvideos').child(childSnapshot.key).remove();
-							resolve(childSnapshot.val());
+							var id = childSnapshot.val();
+							updateNowPlaying(id);
+							resolve(id);
 						});
 					} else {
 						// if there's not a video in bgvideos, then it needs to be replenished
@@ -158,6 +164,32 @@ function spawnFrame() {
 				'onStateChange': onPlayerStateChange
 			}
 		});
+	});
+	checkUnavailable();
+}
+
+function checkUnavailable() {
+	setTimeout(function() {
+		if (player.getPlayerState() == -1) {
+			console.log("This video is probably unavaibale... skipping...");
+			nextVideo();
+		}
+	}, 3000);
+}
+
+// function to be called when we pull a video from bgvideos and therefore need to call
+// the youtube data api to get its title and author for view
+async function updateNowPlaying(id) {
+	await gapi.client.youtube.videos.list({
+		"part": "snippet",
+		"id": id,
+		"key": "AIzaSyDaGqnEmD2ibUlo6YyQaUHgcNl3wsqqtPQ"
+	}).then(function(response) {
+		if (response.result.items[0] !== undefined) {
+			document.getElementById('vid-info-text').innerHTML = "now playing: <b>" + response.result.items[0].snippet.title + "</b> by <b>" + response.result.items[0].snippet.channelTitle + "</b>";
+		} else {
+			console.error("Youtube API was unable to load data id " + id + ".");
+		}
 	});
 }
 

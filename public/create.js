@@ -70,7 +70,7 @@ function claimRoom(id) {
 			var bgvideosupdate = {};
 			update['timestamp'] = Date.now();
 			update['key'] = snapshot.val()[key];
-			update['host'] = 0;
+			update['/users/host'] = 0;
 			gapi.client.youtube.playlistItems.list({
 				"part": "contentDetails",
 				"playlistId": playlistId,

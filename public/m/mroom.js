@@ -139,7 +139,7 @@ function loadActiveQueue() {
 			countElem.setAttribute('class', 'vote-count');
 			// we used to sum the whole votes entry in the db for this, but now we can just pull votecount.
 			// probably more lightweight now that we're just summing one vid on vote click and not all vids on every change to the db
-			countElem.innerHTML = vid.child('votecount').val();
+			countElem.innerHTML = -vid.child('votecount').val();
 
 			//assembly
 
@@ -168,7 +168,7 @@ function updateTimestamp() {
 
 function openAddForm() {
 	var formRef = document.getElementById('add-form');
-	formRef.style.display = "block";
+	formRef.style.display = "flex";
 }
 
 function closeAddForm() {
