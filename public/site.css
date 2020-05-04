@@ -115,7 +115,6 @@ button:focus {
   top: 128px;
   width: 76%;
   height: 76%;
-  z-index: -1;
 }
 
 #paintbrush-button button, #settings-button button, #queue-button button {
@@ -157,4 +156,5 @@ button:focus {
   align-items: center;
   width: 100%;
   height: 100%;
+  z-index: 1;
 }
