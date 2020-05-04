@@ -86,21 +86,6 @@ function shuffle(arr) {
 
 // video functions //
 
-function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-		height: '390',
-		width: '640',
-		videoId: 'u1zgFlCw8Aw',
-		playerVars: {
-			'autoplay': 1
-		},
-		events: {
-			'onReady': onPlayerReady,
-			'onStateChange': onPlayerStateChange
-		}
-    });
-}
-
 function onPlayerReady(event) {
 	if (event.target.getDuration() <= 0) {
 		console.log('Video likely to be removed');
@@ -118,7 +103,13 @@ function onPlayerStateChange(event) {
 function nextVideo() {
 	getNextVideo().then(function(id) {
 		player.loadVideoById(id);
-	})
+	});
+	setTimeout(function() {
+		if (player.getPlayerState() == -1) {
+			console.log("This video is probably unavaibale... skipping...");
+			nextVideo();
+		}
+	}, 3000);
 }
 
 function getNextVideo() {
@@ -143,6 +134,7 @@ function getNextVideo() {
 							resolve(childSnapshot.val());
 						});
 					} else {
+						// if there's not a video in bgvideos, then it needs to be replenished
 						refreshBgvideos();
 					}
 				});
@@ -172,6 +164,6 @@ function spawnFrame() {
 function refreshBgvideos() {
 	console.log("out of videos! figure out how to avoid this later.");
 	// ideally you'd want to reload the playlist but we're not currently
-	// saving that. so we may need to add that to our database structure, or
-	// change how we're deleting videos from the db.
+	// saving that id. so we may need to add the id to our database structure, or
+	// change how we're deleting videos from bgvideos.
 }
